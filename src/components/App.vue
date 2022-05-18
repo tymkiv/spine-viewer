@@ -1,12 +1,12 @@
 <template>
-    <div>Hello {{ name }}!</div>
+    <div>Hello {{ name }}</div>
 </template>
 
 <script>
 export default {
     data() {
         return {
-            name: "Spine Viewer"
+            name: "Spine Viewer!"
         };
     }
 };
