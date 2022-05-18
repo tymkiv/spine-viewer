@@ -1,5 +1,54 @@
 {
+  "name": "spine-viewer",
+  "author": "tymkiv.vr <tymkiv.vr@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "dev": "npm run clean:output && parcel",
+    "build": "npm run clean:output && parcel build src/index.html --public-url ./ --no-scope-hoist --reporter @parcel/reporter-bundle-analyzer",
+    "test": "jest --watch",
+    "clean:output": "rimraf dist"
+  },
+  "source": "src/index.html",
   "devDependencies": {
-    "parcel": "^2.5.0"
+    "@parcel/babel-preset-env": "^2.5.0",
+    "@parcel/reporter-bundle-analyzer": "^2.5.0",
+    "@parcel/transformer-vue": "^2.5.0",
+    "@vue/vue3-jest": "^28.0.0",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^9.0.1",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
+    "parcel": "^2.5.0",
+    "prettier": "^2.6.2",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "vue": "^3.2.33"
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "parcel": {
+    "publicUrl": "./"
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@parcel/babel-preset-env"
+        ]
+      }
+    }
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageProvider": "v8",
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.vue$": "@vue/vue3-jest",
+      "^.+\\.js$": "babel-jest"
+    }
   }
 }

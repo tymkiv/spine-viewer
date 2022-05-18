@@ -1,2 +1,7 @@
 node_modules
+coverage
+dist
+parcel-bundle-reports
+.parcel-cache
 .idea
+.DS_Store

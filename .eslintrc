@@ -1,0 +1,105 @@
+{
+  "env": {
+    "node": true,
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "vue/html-indent": ["error", 4],
+    "linebreak-style": [
+      "error",
+      "windows"
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "no-prototype-builtins": "off",
+    "no-multi-spaces": ["error"],
+    "no-unused-expressions":  ["error", { "allowTernary": true, "allowShortCircuit": true }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "array-bracket-spacing": [
+      "error",
+      "never"
+    ],
+    "array-element-newline": [
+      "error",
+      "consistent"
+    ],
+    "array-bracket-newline": [
+      "error",
+      {
+        "multiline": true
+      }
+    ],
+    "block-spacing": "error",
+    "comma-dangle": ["error", "never"],
+    "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+    "comma-style": "error",
+    "computed-property-spacing": "error",
+    "func-call-spacing": "error",
+    "no-trailing-spaces": ["error", { "skipBlankLines": true }],
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "key-spacing": "error",
+    "keyword-spacing": "error",
+    "no-negated-condition": "error",
+    "no-tabs": "error",
+    "no-unneeded-ternary": "error",
+    "no-whitespace-before-property": "error",
+    "object-curly-newline": "error",
+    "object-curly-spacing": ["error", "always"],
+    "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": true }],
+    "comma-spacing": "error",
+    "space-in-parens": "error",
+    "operator-assignment": "error",
+    "operator-linebreak": "error",
+    "semi-spacing": "error",
+    "semi-style": "error",
+    "space-before-function-paren": [
+      "error",
+      "never"
+    ],
+    "space-before-blocks": "error",
+    "space-infix-ops": "error",
+    "space-unary-ops": "error",
+    "switch-colon-spacing": "error",
+    "default-case-last": "error",
+    "no-fallthrough": "off",
+    "no-case-declarations": "off",
+    "no-setter-return": "off",
+    "arrow-spacing": "error"
+  },
+  "ignorePatterns": [
+    ".eslintrc.js"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.js"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
+}
