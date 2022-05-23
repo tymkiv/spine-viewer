@@ -3,24 +3,21 @@
 
     <top-menu />
 
-    <split-container
-        :dbl-click-splitter="false"
-        horizontal
-        class="split-container"
-    >
+    <split-container :dbl-click-splitter="false" horizontal class="split-container">
         <split-pane>
             <split-container :dbl-click-splitter="false">
-                <split-pane size="20" max-size="40" min-size="5">
+                <split-pane size="60" max-size="40" min-size="5">
                     <layers-menu />
                 </split-pane>
-                <split-pane min-size="20">
-                    <span>Scene</span>
-                </split-pane>
+
+                <split-pane min-size="20"> </split-pane>
+
                 <split-pane size="20" max-size="40" min-size="5">
                     <resources-menu />
                 </split-pane>
             </split-container>
         </split-pane>
+
         <split-pane size="30" max-size="90" min-size="5">
             <timeline-menu />
         </split-pane>

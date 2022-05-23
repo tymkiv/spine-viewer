@@ -17,6 +17,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "max-len": ["error", {"code": 130}],
     "vue/html-indent": ["error", 4],
     "linebreak-style": [
       "error",
