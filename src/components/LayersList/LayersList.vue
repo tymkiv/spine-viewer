@@ -1,11 +1,12 @@
 <template>
     <nested-transition-group
-        :nested-level="0"
-        :dragend="dragend"
-        :dragleave="dragleave"
-        :dragover="dragover"
-        :dragstart="dragstart"
         :items="items"
+        :nested-level="0"
+        :dragstart="dragstart"
+        :dragover="dragover"
+        :dragleave="dragleave"
+        :dragend="dragend"
+        :on-btn-remove-click="onBtnRemoveClick"
         :drag-target="dragTarget"
         :drop-target="dropTarget"
         :drop-target-place="dropTargetPlace"
@@ -13,19 +14,14 @@
 </template>
 
 <script>
-import NestedTransitionGroup from "../NestedTransitionGroup";
 import { v4 } from "uuid";
+
+import NestedTransitionGroup from "../NestedTransitionGroup";
+import { includes, findIndexes } from "../../utils";
 
 export default {
     components: { NestedTransitionGroup },
-    props: {
-        items: {
-            type: Array,
-            required: true,
-            default: () => []
-        }
-    },
-    emits: ["update:items"],
+
     data() {
         return {
             dragTarget: null,
@@ -33,323 +29,156 @@ export default {
             dropTargetPlace: null
         };
     },
-    computed: {
-        sortedItems() {
-            if (!this.dragTarget || !this.dropTarget || !this.dropTargetPlace || this.dragTarget === this.dropTarget) {
-                return this.items;
-            }
 
-            return this.dragTargetDropTarget(this.dragTarget, this.dropTarget);
+    computed: {
+        items() {
+            return this.$store.state.items;
         }
     },
-    watch: {},
 
     methods: {
         dragstart(item) {
             this.dragTarget = item;
         },
+
         dragend() {
-            this.$emit("update:items", this.sortedItems);
+            this.dragTargetDropTarget(this.dragTarget, this.dropTarget, this.dropTargetPlace);
+
             this.dragTarget = null;
             this.dropTarget = null;
             this.dropTargetPlace = null;
         },
-        dragover(item, e) {
+
+        dragover(dropTarget, e) {
+            this.dropTarget = dropTarget;
+
             // Переводим попытки вставить группу в итем
-            if (this.dragTarget.type === "group" && item.type === "item") {
-                const indexes = this.findIndexRecursive(item, this.items);
-                item = this.items[indexes[0]];
+            if (this.dragTarget.type === "group" && this.dropTarget.type === "item") {
+                const indexes = findIndexes(this.items, this.dropTarget);
+                this.dropTarget = this.items[indexes[0]];
             }
 
             // Попытка вставить себя в себя
-            if (this.dragTarget === item) {
+            if (this.dragTarget === this.dropTarget) {
                 return;
             }
 
             // Перевести попытки вставить родительский итем в дочерний
-            if (this.dragTarget.type === "item" && item.type === "item") {
-                if (this.containsRecursive(item, this.dragTarget.items)) {
+            if (this.dragTarget.type === "item" && this.dropTarget.type === "item") {
+                if (includes(this.dragTarget.items, this.dropTarget)) {
                     return;
                 }
             }
 
-            this.dropTarget = item;
+            let domElement;
 
             if (this.dropTarget.type === "item") {
-                const target = e.target.closest(".list-item_item");
-                const { top, bottom } = target.getBoundingClientRect();
-                const height = bottom - top;
-
-                const y = e.clientY - top;
-
-                const borderTop = {
-                    start: 0,
-                    end: 10
-                };
-                const borderBottom = {
-                    start: height - 10,
-                    end: height
-                };
-
-                if (y <= borderTop.end) {
-                    this.dropTargetPlace = "top";
-                } else if (y >= borderBottom.start && y <= borderBottom.end) {
-                    this.dropTargetPlace = "bottom";
-                } else {
-                    // } else if (y > borderTop.end && y < borderBottom.start) {
-                    this.dropTargetPlace = "self";
-                }
+                domElement = e.target.closest(".list-item_item");
             }
 
             if (this.dropTarget.type === "group") {
-                const target = e.target.closest(".list-item_group");
-                const { top, bottom } = target.getBoundingClientRect();
-                const height = bottom - top;
-                const y = e.clientY - top;
-
-                const borderTop = 20;
-                const borderBottom = height - 20;
-
-                this.dropTargetPlace = y < borderTop ? "top" : y > borderBottom ? "bottom" : "self";
+                domElement = e.target.closest(".list-item_group");
             }
 
-            console.log(this.dropTarget.name, this.dropTargetPlace);
+            const { top, bottom } = domElement.getBoundingClientRect();
+
+            const y = e.clientY - top;
+            const height = bottom - top;
+            const borderTop = 10;
+            const borderBottom = height - 10;
+
+            this.dropTargetPlace = y <= borderTop ? "top" : y >= borderBottom ? "bottom" : "self";
         },
+
         dragleave() {
             this.dropTarget = null;
             this.dropTargetPlace = null;
         },
 
-        containsRecursive(target, items) {
-            if (!items) return;
-
-            for (let i = 0; i < items.length; i++) {
-                const nestedItem = items[i];
-                if (target.id === nestedItem.id) return true;
-
-                if (Array.isArray(nestedItem.items)) {
-                    const result = this.containsRecursive(target, nestedItem.items);
-
-                    if (result) return result;
-                }
+        dragTargetDropTarget(dragTarget, dropTarget, dropTargetPlace) {
+            if (!dragTarget || !dropTarget || !dropTargetPlace || dragTarget === dropTarget) {
+                return;
             }
+            const dragIndexes = findIndexes(this.items, dragTarget);
 
-            return false;
-        },
+            this.$store.commit("removeItemByIndexes", { indexes: dragIndexes });
 
-        // isTargetLast(target, items) {
-        //     for (let i = 0; i < items.length; i++) {
-        //         const nestedItem = items[i];
-        //
-        //         if (target.id === nestedItem.id && i === items.length - 1) return true;
-        //
-        //         if (Array.isArray(nestedItem.items)) {
-        //             const result = this.isTargetLast(target, nestedItem.items);
-        //
-        //             if (result) return result;
-        //         }
-        //     }
-        //
-        //     return false;
-        // },
+            const dropIndexes = findIndexes(this.items, dropTarget);
 
-        // findParent(target, items, parent) {
-        //     for (let i = 0; i < items.length; i++) {
-        //         const nestedItem = items[i];
-        //
-        //         if (target.id === nestedItem.id) return parent;
-        //
-        //         if (Array.isArray(nestedItem.items)) {
-        //             const res = this.findParent(target, nestedItem.items, nestedItem);
-        //
-        //             if (res) return res;
-        //         }
-        //     }
-        //
-        //     return null;
-        // },
-
-        findIndexRecursive(target, items) {
-            for (let i = 0; i < items.length; i++) {
-                const nestedItem = items[i];
-
-                if (target.id === nestedItem.id) return [i];
-
-                if (Array.isArray(nestedItem.items)) {
-                    const idx = this.findIndexRecursive(target, nestedItem.items);
-
-                    if (idx) return [i, ...idx];
-                }
-            }
-
-            return null;
-        },
-
-        cloneItems(items) {
-            const clonedItems = [...items];
-
-            for (let i = 0; i < clonedItems.length; i++) {
-                clonedItems[i] = {
-                    ...clonedItems[i]
-                };
-                if (Array.isArray(clonedItems[i].items)) {
-                    clonedItems[i].items = this.cloneItems(clonedItems[i].items);
-                }
-            }
-
-            return clonedItems;
-        },
-
-        removeFrom(items, indexes) {
-            for (let i = 0; i < indexes.length - 1; i++) {
-                items = items[indexes[i]].items;
-            }
-            items.splice(indexes[indexes.length - 1], 1);
-        },
-
-        insertTo(items, indexes, ...target) {
-            // console.log(indexes);
-            for (let i = 0; i < indexes.length - 1; i++) {
-                // console.log(indexes[i]);
-                // console.log(items[indexes[i]]);
-                items = items[indexes[i]].items ?? (items[indexes[i]].items = []);
-                // console.log(items);
-            }
-            if (Array.isArray(target)) {
-                items.splice(indexes[indexes.length - 1], 0, ...target);
-            } else {
-                items.splice(indexes[indexes.length - 1], 0, target);
-            }
-        },
-
-        dragTargetDropTarget(dragTarget, dropTarget) {
-            const sortedItems = this.cloneItems(this.items);
-
-            const dragIndexes = this.findIndexRecursive(dragTarget, sortedItems);
-
-            this.removeFrom(sortedItems, dragIndexes);
-
-            const dropIndexes = this.findIndexRecursive(dropTarget, sortedItems);
-
-            if (this.dropTargetPlace === "bottom") {
+            if (dropTargetPlace === "bottom") {
                 dropIndexes[dropIndexes.length - 1] += 1;
             }
 
-            if (
-                dragTarget.type === "item" &&
-                dropTarget.type === "group" &&
-                (this.dropTargetPlace === "top" || this.dropTargetPlace === "bottom")
-            ) {
-                dragTarget = {
-                    id: v4(),
-                    name: "Scene name 11111",
-                    type: "group",
-                    items: [dragTarget]
-                };
-            }
-
-            if (dragTarget.type === "group" && this.dropTargetPlace === "self") {
-                dragTarget = dragTarget.items;
-                // console.log(dragTarget);
-            }
-
-            if (this.dropTargetPlace === "self") {
+            if (dropTargetPlace === "self") {
                 dropIndexes.push(0);
             }
 
-            if (Array.isArray(dragTarget)) {
-                this.insertTo(sortedItems, dropIndexes, ...dragTarget);
-            } else {
-                this.insertTo(sortedItems, dropIndexes, dragTarget);
+            // Создать новую сцену, если item должен быть вставлен на самый первый уровень
+            const isNewSceneNeeded = this.isNewSceneNeeded(dragTarget, dropTarget, dropTargetPlace);
+            dragTarget = isNewSceneNeeded ? this.createNewScene([dragTarget]) : dragTarget;
+
+            // Перехватить только items, если scene пытается быть вставленной в другую scene
+            const isOnlyItemsNeeded = this.isOnlyItemsNeeded(dragTarget, dropTargetPlace);
+            dragTarget = isOnlyItemsNeeded ? dragTarget.items : dragTarget;
+
+            // dragTarget должен быть массивом
+            dragTarget = Array.isArray(dragTarget) ? dragTarget : [dragTarget];
+
+            this.$store.commit("insert", { itemsToInsert: dragTarget, indexes: dropIndexes });
+
+            // Удаление пустой группы
+            this.tryToRemoveEmptyScene(dragIndexes[0]);
+        },
+
+        onBtnRemoveClick(item) {
+            const indexes = findIndexes(this.items, item);
+
+            const nestedItems = item.items;
+
+            this.$store.commit("removeItemByIndexes", { indexes: indexes });
+            this.$store.commit("insert", { itemsToInsert: nestedItems, indexes: indexes });
+
+            if (this.$store.getters.selectedItem === item) {
+                this.$store.commit("unselectItem");
             }
 
             // Удаление пустой группы
-            if (sortedItems[dragIndexes[0]]?.items.length === 0) {
-                sortedItems.splice(dragIndexes[0], 1);
-            }
+            this.tryToRemoveEmptyScene(indexes[0]);
+        },
 
-            return sortedItems;
+        tryToRemoveEmptyScene(index) {
+            // Удаление пустой группы
+            if (this.items[index]?.items.length === 0) {
+                if (this.$store.getters.selectedScene === this.items[index]) {
+                    this.$store.commit("unselectScene");
+                }
+                if (this.$store.getters.selectedItem === this.items[index]) {
+                    this.$store.commit("unselectItem");
+                }
+                this.$store.commit("removeItemByIndexes", { indexes: [index] });
+            }
+        },
+
+        isNewSceneNeeded(dragTarget, dropTarget, dropTargetPlace) {
+            return (
+                dragTarget.type === "item" &&
+                dropTarget.type === "group" &&
+                (dropTargetPlace === "top" || dropTargetPlace === "bottom")
+            );
+        },
+
+        isOnlyItemsNeeded(dragTarget, dropTargetPlace) {
+            return dragTarget.type === "group" && dropTargetPlace === "self";
+        },
+
+        createNewScene(items) {
+            return {
+                id: v4(),
+                name: "Scene name 11111",
+                type: "group",
+                items
+            };
         }
     }
 };
 </script>
-
-<style>
-.list-item {
-    transition: all 0.3s ease;
-    position: relative;
-    padding: 0 20px;
-    outline: 1px solid red;
-    /*overflow: hidden;*/
-}
-
-.list-item input {
-    display: block;
-    height: 40px;
-    margin: 0;
-    padding: 0;
-    border: none;
-    background-color: transparent;
-}
-
-.list-item input:focus {
-    outline: none;
-}
-
-.list-item.list-item_parent {
-    padding-bottom: 10px;
-    /*box-sizing: border-box;*/
-}
-
-.list-item:not(.list-item_parent) {
-    height: 40px;
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*justify-content: center;*/
-}
-
-.list-item_drop-target {
-    z-index: 50;
-}
-
-.list-item_drop-target_top:after,
-.list-item_drop-target_bottom:after,
-.list-item_drop-target_self:after {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: 20px;
-    right: 20px;
-    height: 2px;
-
-    background-color: #000;
-    pointer-events: none;
-}
-
-.list-item_drop-target_bottom:after {
-    top: auto;
-    bottom: -1px;
-}
-
-.list-item_drop-target_self:after {
-    top: 50%;
-    margin-top: -1px;
-}
-.list-item.list-item_parent.list-item_drop-target_self:after {
-    left: 40px;
-    right: 40px;
-    top: 40px;
-}
-
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
-    height: 0 !important;
-}
-</style>
-
-<style scoped>
-.wrapper {
-    background-image: url("../../resources/pattern.jpg");
-}
-</style>

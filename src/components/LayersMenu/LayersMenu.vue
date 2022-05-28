@@ -3,15 +3,22 @@
         <div class="lm__wrapper">
             <h2 class="lm__top">Layers</h2>
             <div class="lm__list-wrapper">
-                <layers-list v-model:title="title" v-model:items="items" />
+                <layers-list />
                 <hr />
                 <h2>{{ title }}</h2>
-                <div v-for="group in items" :key="group.id">
+                <div v-for="group in $store.state.items" :key="group.id">
                     {{ group.name }}
-                    <div v-for="item in group.items" :key="item.id">
+                    <div style="padding: 0 20px" v-for="item in group.items" :key="item.id">
                         {{ item.name }}
+                        <div style="padding: 0 20px" v-for="item2 in item.items" :key="item2.id">
+                            {{ item2.name }}
+                        </div>
                     </div>
                 </div>
+
+                <hr />
+                Selected item:
+                {{ $store.getters.selectedItem }}
             </div>
         </div>
     </div>
@@ -19,85 +26,21 @@
 
 <script>
 import LayersList from "../LayersList";
-import { v4 } from "uuid";
+
 export default {
     components: { LayersList },
 
     data() {
         window.t = this;
+
         return {
-            title: "some title",
-            items: [
-                {
-                    id: v4(),
-                    name: "Scene name 1",
-                    type: "group",
-                    items: [
-                        { id: v4(), name: "Spline name 1", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 2", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 3", type: "item", items: [] }
-                    ]
-                },
-                {
-                    id: v4(),
-                    name: "Scene name 2",
-                    type: "group",
-                    items: [
-                        { id: v4(), name: "Spline name 4", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 5", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 6", type: "item", items: [] }
-                    ]
-                },
-                {
-                    id: v4(),
-                    name: "Scene name 3",
-                    type: "group",
-                    items: [
-                        { id: v4(), name: "Spline name 7", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 8", type: "item", items: [] },
-                        { id: v4(), name: "Spline name 9", type: "item", items: [] }
-                    ]
-                }
-            ]
-            // items: [
-            //     {
-            //         id: 1,
-            //         name: "name-1",
-            //         group: "gr1",
-            //         groupId: v4()
-            //     },
-            //     {
-            //         id: 2,
-            //         name: "name-2",
-            //         group: "gr2",
-            //         groupId: v4()
-            //     },
-            //     {
-            //         id: 3,
-            //         name: "name-3",
-            //         group: "gr3",
-            //         groupId: v4()
-            //     },
-            //     {
-            //         id: 4,
-            //         name: "name-4",
-            //         group: "gr4",
-            //         groupId: v4()
-            //     },
-            //     {
-            //         id: 5,
-            //         name: "name-5",
-            //         group: "gr5",
-            //         groupId: v4()
-            //     },
-            //     {
-            //         id: 6,
-            //         name: "name-6",
-            //         group: "gr6",
-            //         groupId: v4()
-            //     }
-            // ]
+            title: "some title"
         };
+    },
+    computed: {
+        // items2() {
+        //     return store.state.count
+        // }
     }
 };
 </script>
@@ -120,6 +63,7 @@ export default {
         padding: 0 20px
         box-shadow: var(--shadow)
         font-weight: 600
+        font-size: 14px
 
     &__list-wrapper
         overflow: auto

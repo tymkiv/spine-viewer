@@ -1,4 +1,6 @@
 <template>
+    <button @click="increment">increment</button>
+    {{ count }}
     <settings-menu />
 
     <top-menu />
@@ -42,6 +44,16 @@ export default {
         LayersMenu,
         ResourcesMenu,
         TimelineMenu
+    },
+    computed: {
+        count() {
+            return this.$store.state.count;
+        }
+    },
+    methods: {
+        increment() {
+            this.$store.commit("increment");
+        }
     }
 };
 </script>
