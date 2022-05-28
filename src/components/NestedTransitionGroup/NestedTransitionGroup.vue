@@ -1,47 +1,57 @@
 <template>
-    <!--    height нужно для того, что бы появление нового списка анимировалось как надо-->
-    <transition-group name="list" tag="ul">
+    <transition-group
+        name="list"
+        tag="ul"
+    >
         <li
             v-for="(item, index) in items"
             :key="item.id"
-            :class="[
-                'list-item',
-                `list-item_${item.type}`,
-                `list-item_color-${nestedLevel % 2 === 0 ? 1 : 2}`,
-                {
-                    'list-item_selected': $store.getters.selectedItem === item,
-                    'list-item_parent': item.items?.length,
-                    'list-item_drag-target': dragTarget === item,
-                    'list-item_drop-target': dropTarget === item,
-                    'list-item_drop-target_top': dropTarget === item && dropTargetPlace === 'top',
-                    'list-item_drop-target_bottom': dropTarget === item && dropTargetPlace === 'bottom',
-                    'list-item_drop-target_self': dropTarget === item && dropTargetPlace === 'self'
-                }
-            ]"
+            :class="itemsClass[index]"
             :style="{ height: `${item._closed ? 40 : itemsHeight[index]}px` }"
-            :draggable="true"
+            draggable="true"
             @dragstart.stop="dragstart(item)"
             @dragover.stop.prevent="dragover(item, $event)"
             @dragleave.stop="dragleave()"
             @dragend.stop="dragend()"
-            @click.stop="$store.commit('selectItem', { item: item })"
+            @click.stop="onItemSelect(item)"
         >
-            <div v-if="item.type === 'group'" class="item-header">
-                <button class="close-btn" @click="onBtnCloseClick(item)">-</button>
+            <div
+                v-if="item.type === LIST_ITEM_TYPE_SCENE"
+                class="item-header"
+            >
+                <button
+                    class="close-btn"
+                    @click.stop="onBtnCloseClick(item, $event.target)"
+                >
+                    -
+                </button>
+
                 <input
-                    :checked="$store.getters.selectedScene === item"
+                    :checked="$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === item"
                     type="radio"
                     name="group"
                     :value="item.name"
-                    @change="$store.commit('selectScene', { item: item })"
+                    @change="$store.commit('selectToDisplay', { item: item })"
                     @click.stop
                 />
-                <h2 class="item-name">{{ item.name }}</h2>
+                <h2 class="item-name">
+                    {{ item.name }}
+                </h2>
             </div>
-            <div v-else class="item-header">
-                <h2 class="item-name">{{ item.name }}</h2>
+            <div
+                v-else
+                class="item-header"
+            >
+                <h2 class="item-name">
+                    {{ item.name }}
+                </h2>
 
-                <button class="remove-btn" @click.stop="onBtnRemoveClick(item)">X</button>
+                <button
+                    class="remove-btn"
+                    @click.stop="onBtnRemoveClick(item)"
+                >
+                    X
+                </button>
             </div>
 
             <nested-transition-group
@@ -62,6 +72,10 @@
 </template>
 
 <script>
+import gsap from "gsap";
+
+import { LIST_ITEM_TYPE_ITEM, LIST_ITEM_TYPE_SCENE, LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../../constants";
+
 export default {
     name: "NestedTransitionGroup",
     props: {
@@ -112,13 +126,39 @@ export default {
     computed: {
         itemsHeight() {
             return this.items.map((item) => this.getHeight(item));
+        },
+
+        itemsClass() {
+            return this.items.map((item) => [
+                "list-item",
+                `list-item_${item.type}`,
+                `list-item_color-${this.nestedLevel % 2 === 0 ? 1 : 2}`,
+                {
+                    "list-item_closed": item._closed,
+                    "list-item_selected": this.$store.getters.selectedItem[LIST_ITEM_TO_REDACT] === item,
+                    "list-item_parent": item.items?.length,
+                    "list-item_drag-target": this.dragTarget === item,
+                    "list-item_drop-target": this.dropTarget === item,
+                    "list-item_drop-target_top": this.dropTarget === item && this.dropTargetPlace === "top",
+                    "list-item_drop-target_bottom": this.dropTarget === item && this.dropTargetPlace === "bottom",
+                    "list-item_drop-target_self": this.dropTarget === item && this.dropTargetPlace === "self"
+                }
+            ]);
+        },
+        LIST_ITEM_TYPE_ITEM() {
+            return LIST_ITEM_TYPE_ITEM;
+        },
+        LIST_ITEM_TYPE_SCENE() {
+            return LIST_ITEM_TYPE_SCENE;
+        },
+        LIST_ITEM_TO_REDACT() {
+            return LIST_ITEM_TO_REDACT;
+        },
+        LIST_ITEM_TO_DISPLAY() {
+            return LIST_ITEM_TO_DISPLAY;
         }
-        // itemClassObject
     },
     methods: {
-        clicked(item) {
-            this.$emit("update-selected-item", item);
-        },
         getHeight(item) {
             const height = 40;
             const nestedItemsHeight = item.items
@@ -130,8 +170,21 @@ export default {
             return height + nestedItemsHeight + pb;
         },
 
-        onBtnCloseClick(item) {
+        onBtnCloseClick(item, domElement) {
             item._closed = !item._closed;
+            const ul = domElement.closest(".list-item").querySelector("ul");
+            item._delayedCall?.kill();
+            if (item._closed) {
+                item._delayedCall = gsap.delayedCall(0.3, () => gsap.set(ul, { display: "none" }));
+            } else {
+                gsap.set(ul, { display: "" });
+            }
+
+        },
+
+        onItemSelect(item) {
+            this.$store.commit("selectToRedact", { item: item });
+            this.$store.commit("addAppClickListener", { callback: () => this.$store.commit("unselectToRedact"), once: true });
         }
     }
 };
@@ -149,6 +202,7 @@ export default {
     position: relative
     padding: 0 10px
     box-sizing: border-box
+    overflow: hidden
 
     .item-name
         font-size: 14px
@@ -157,9 +211,6 @@ export default {
     &_selected
         & > .item-header
             color: blue
-
-    &_group
-        overflow: hidden
 
     &_color-1
         background-color: #EAEAEB
@@ -199,4 +250,10 @@ export default {
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
+
+@keyframes anim
+    0%
+        display: initial
+    100%
+        display: none
 </style>

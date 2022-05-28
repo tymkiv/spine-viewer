@@ -1,4 +1,6 @@
 import { findIndexes } from "../utils";
+import { LIST_ITEM_TYPE_SCENE, LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../constants";
+
 /**
  * An element of array
  * @typedef {object} Item
@@ -57,20 +59,32 @@ const insert = ({ items }, { itemsToInsert, indexes }) => {
 };
 
 export default {
-    selectItem(state, { item }) {
-        state._selectedItem = item;
+    selectToRedact(state, { item }) {
+        state._selectedItem[LIST_ITEM_TO_REDACT] = item;
     },
 
-    unselectItem(state) {
-        state._selectedItem = null;
+    unselectToRedact(state) {
+        state._selectedItem[LIST_ITEM_TO_REDACT] = null;
     },
 
-    selectScene(state, { item }) {
-        state._selectedScene = item;
+    selectToDisplay(state, { item }) {
+        state._selectedItem[LIST_ITEM_TO_DISPLAY] = item;
     },
 
-    unselectScene(state) {
-        state._selectedScene = null;
+    unselectToDisplay(state) {
+        state._selectedItem[LIST_ITEM_TO_DISPLAY] = null;
+    },
+
+    addAppClickListener(state, { callback, once = false }) {
+        const coveredCallback = once
+            ? () => { callback(); state.appClickListeners = state.appClickListeners.filter((cb) => cb !== coveredCallback); }
+            : callback;
+
+        state.appClickListeners.push(coveredCallback);
+    },
+
+    removeAppClickListener(state, { callback }) {
+        state.appClickListeners = state.appClickListeners.filter((cb) => cb !== callback);
     },
 
     removeItem,

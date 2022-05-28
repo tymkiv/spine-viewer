@@ -16,16 +16,14 @@
     "@parcel/transformer-vue": "^2.5.0",
     "@vue/vue3-jest": "^28.0.0",
     "eslint": "^8.15.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^9.0.1",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
     "parcel": "^2.5.0",
-    "prettier": "^2.6.2",
     "rimraf": "^3.0.2"
   },
   "dependencies": {
+    "gsap": "^3.10.4",
     "lodash": "^4.17.21",
     "reset-css": "^5.0.1",
     "splitpanes": "^3.1.1",

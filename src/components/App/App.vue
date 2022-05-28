@@ -1,29 +1,47 @@
 <template>
-    <button @click="increment">increment</button>
-    {{ count }}
-    <settings-menu />
+    <div @click="appClick">
+        <settings-menu />
 
-    <top-menu />
+        <top-menu />
 
-    <split-container :dbl-click-splitter="false" horizontal class="split-container">
-        <split-pane>
-            <split-container :dbl-click-splitter="false">
-                <split-pane size="60" max-size="40" min-size="5">
-                    <layers-menu />
-                </split-pane>
+        <split-container
+            :dbl-click-splitter="false"
+            horizontal
+            class="split-container"
+        >
+            <split-pane>
+                <split-container
+                    :dbl-click-splitter="false"
+                >
+                    <split-pane
+                        size="60"
+                        max-size="40"
+                        min-size="5"
+                    >
+                        <layers-menu />
+                    </split-pane>
 
-                <split-pane min-size="20"> </split-pane>
+                    <split-pane min-size="20"></split-pane>
 
-                <split-pane size="20" max-size="40" min-size="5">
-                    <resources-menu />
-                </split-pane>
-            </split-container>
-        </split-pane>
+                    <split-pane
+                        size="20"
+                        max-size="40"
+                        min-size="5"
+                    >
+                        <resources-menu />
+                    </split-pane>
+                </split-container>
+            </split-pane>
 
-        <split-pane size="30" max-size="90" min-size="5">
-            <timeline-menu />
-        </split-pane>
-    </split-container>
+            <split-pane
+                size="30"
+                max-size="90"
+                min-size="5"
+            >
+                <timeline-menu />
+            </split-pane>
+        </split-container>
+    </div>
 </template>
 
 <script>
@@ -45,14 +63,9 @@ export default {
         ResourcesMenu,
         TimelineMenu
     },
-    computed: {
-        count() {
-            return this.$store.state.count;
-        }
-    },
     methods: {
-        increment() {
-            this.$store.commit("increment");
+        appClick() {
+            this.$store.state.appClickListeners.forEach(cb => cb());
         }
     }
 };

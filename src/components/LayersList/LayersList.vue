@@ -1,5 +1,6 @@
 <template>
     <nested-transition-group
+        class="layers-list"
         :items="items"
         :nested-level="0"
         :dragstart="dragstart"
@@ -10,6 +11,8 @@
         :drag-target="dragTarget"
         :drop-target="dropTarget"
         :drop-target-place="dropTargetPlace"
+        @dragover.stop.prevent="dragover({type: LIST_ITEM_TYPE_LIST}, $event)"
+        @dragleave.stop="dragleave()"
     />
 </template>
 
@@ -18,6 +21,13 @@ import { v4 } from "uuid";
 
 import NestedTransitionGroup from "../NestedTransitionGroup";
 import { includes, findIndexes } from "../../utils";
+import {
+    LIST_ITEM_TYPE_LIST,
+    LIST_ITEM_TYPE_SCENE,
+    LIST_ITEM_TO_REDACT,
+    LIST_ITEM_TYPE_ITEM,
+    LIST_ITEM_TO_DISPLAY
+} from "../../constants";
 
 export default {
     components: { NestedTransitionGroup },
@@ -33,6 +43,10 @@ export default {
     computed: {
         items() {
             return this.$store.state.items;
+        },
+
+        LIST_ITEM_TYPE_LIST() {
+            return LIST_ITEM_TYPE_LIST;
         }
     },
 
@@ -52,8 +66,8 @@ export default {
         dragover(dropTarget, e) {
             this.dropTarget = dropTarget;
 
-            // Переводим попытки вставить группу в итем
-            if (this.dragTarget.type === "group" && this.dropTarget.type === "item") {
+            // Переводим попытки вставить scene в item
+            if (this.dragTarget.type === LIST_ITEM_TYPE_SCENE && this.dropTarget.type === LIST_ITEM_TYPE_ITEM) {
                 const indexes = findIndexes(this.items, this.dropTarget);
                 this.dropTarget = this.items[indexes[0]];
             }
@@ -63,21 +77,35 @@ export default {
                 return;
             }
 
-            // Перевести попытки вставить родительский итем в дочерний
-            if (this.dragTarget.type === "item" && this.dropTarget.type === "item") {
-                if (includes(this.dragTarget.items, this.dropTarget)) {
-                    return;
-                }
+            // Перевести попытки вставить родительский item в дочерний
+            if (
+                this.dragTarget.type === LIST_ITEM_TYPE_ITEM &&
+                this.dropTarget.type === LIST_ITEM_TYPE_ITEM &&
+                includes(this.dragTarget.items, this.dropTarget)
+            ) {
+                return;
             }
 
             let domElement;
 
-            if (this.dropTarget.type === "item") {
-                domElement = e.target.closest(".list-item_item");
+            if (this.dropTarget.type === LIST_ITEM_TYPE_ITEM) {
+                domElement = e.target.closest(`.list-item_${LIST_ITEM_TYPE_ITEM}`);
             }
 
-            if (this.dropTarget.type === "group") {
-                domElement = e.target.closest(".list-item_group");
+            if (this.dropTarget.type === LIST_ITEM_TYPE_SCENE) {
+                domElement = e.target.closest(`.list-item_${LIST_ITEM_TYPE_SCENE}`);
+            }
+
+            if (this.dropTarget.type === LIST_ITEM_TYPE_LIST) {
+                const mouseY = e.clientY;
+                const domScenes = [...e.target.querySelectorAll(`.list-item_${LIST_ITEM_TYPE_SCENE}`)];
+                domScenes.forEach((domScene, index) => {
+                    const top = domScene.getBoundingClientRect().top;
+                    if (mouseY >= top) {
+                        domElement = domScene;
+                        this.dropTarget = this.items[index];
+                    }
+                });
             }
 
             const { top, bottom } = domElement.getBoundingClientRect();
@@ -138,8 +166,8 @@ export default {
             this.$store.commit("removeItemByIndexes", { indexes: indexes });
             this.$store.commit("insert", { itemsToInsert: nestedItems, indexes: indexes });
 
-            if (this.$store.getters.selectedItem === item) {
-                this.$store.commit("unselectItem");
+            if (this.$store.getters.selectedItem[LIST_ITEM_TO_REDACT] === item) {
+                this.$store.commit("unselectToRedact");
             }
 
             // Удаление пустой группы
@@ -148,37 +176,45 @@ export default {
 
         tryToRemoveEmptyScene(index) {
             // Удаление пустой группы
-            if (this.items[index]?.items.length === 0) {
-                if (this.$store.getters.selectedScene === this.items[index]) {
-                    this.$store.commit("unselectScene");
+            const itemToRemove = this.items[index];
+
+            if (itemToRemove?.items.length === 0) {
+                this.$store.commit("removeItem", { item: itemToRemove });
+                if (this.$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === itemToRemove) {
+                    this.$store.commit("unselectToDisplay");
                 }
-                if (this.$store.getters.selectedItem === this.items[index]) {
-                    this.$store.commit("unselectItem");
+                if (this.$store.getters.selectedItem[LIST_ITEM_TO_REDACT] === itemToRemove) {
+                    this.$store.commit("unselectToRedact");
                 }
-                this.$store.commit("removeItemByIndexes", { indexes: [index] });
             }
         },
 
         isNewSceneNeeded(dragTarget, dropTarget, dropTargetPlace) {
             return (
-                dragTarget.type === "item" &&
-                dropTarget.type === "group" &&
+                dragTarget.type === LIST_ITEM_TYPE_ITEM &&
+                dropTarget.type === LIST_ITEM_TYPE_SCENE &&
                 (dropTargetPlace === "top" || dropTargetPlace === "bottom")
             );
         },
 
         isOnlyItemsNeeded(dragTarget, dropTargetPlace) {
-            return dragTarget.type === "group" && dropTargetPlace === "self";
+            return dragTarget.type === LIST_ITEM_TYPE_SCENE && dropTargetPlace === "self";
         },
 
         createNewScene(items) {
             return {
                 id: v4(),
                 name: "Scene name 11111",
-                type: "group",
+                type: LIST_ITEM_TYPE_SCENE,
                 items
             };
         }
     }
 };
 </script>
+
+<style scoped lang="sass">
+.layers-list
+    min-height: 100%
+
+</style>
