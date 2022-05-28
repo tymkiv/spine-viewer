@@ -1,5 +1,5 @@
 import { findIndexes } from "../utils";
-import { LIST_ITEM_TYPE_SCENE, LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../constants";
+import { LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../constants";
 
 /**
  * An element of array
@@ -85,6 +85,10 @@ export default {
 
     removeAppClickListener(state, { callback }) {
         state.appClickListeners = state.appClickListeners.filter((cb) => cb !== callback);
+    },
+
+    redactName(state, { value }) {
+        state._selectedItem[LIST_ITEM_TO_REDACT].name = value;
     },
 
     removeItem,

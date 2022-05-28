@@ -1,8 +1,33 @@
 <template>
     <div class="top-menu">
         <div class="top-menu__shadow"></div>
+
+        <div class="manage-center"></div>
+
+        <div class="redact-center">
+            <label v-if="$store.getters.selectedItem.redact" @click.stop>
+                Name:
+                <input type="text" :value="redact" @input="redactName($event.target.value)">
+            </label>
+        </div>
     </div>
 </template>
+
+<script>
+export default {
+    computed: {
+        redact() {
+            return this.$store.getters.selectedItem.redact.name;
+        }
+    },
+
+    methods: {
+        redactName(value) {
+            this.$store.commit("redactName", { value });
+        }
+    }
+};
+</script>
 
 <style scoped lang="sass">
 .top-menu

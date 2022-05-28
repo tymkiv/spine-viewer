@@ -14,7 +14,7 @@
                     :dbl-click-splitter="false"
                 >
                     <split-pane
-                        size="60"
+                        size="20"
                         max-size="40"
                         min-size="5"
                     >

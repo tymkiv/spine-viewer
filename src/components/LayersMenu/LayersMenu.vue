@@ -38,6 +38,8 @@ export default {
         box-shadow: var(--shadow)
         font-weight: 600
         font-size: 14px
+        position: relative
+        z-index: 10
 
     &__list-wrapper
         overflow: auto

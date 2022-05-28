@@ -19,21 +19,25 @@
                 v-if="item.type === LIST_ITEM_TYPE_SCENE"
                 class="item-header"
             >
+                <label class="radio-label" @click.stop>
+                    <input
+                        type="radio"
+                        name="group"
+                        :checked="$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === item"
+                        :value="item.name"
+                        @change="$store.commit('selectToDisplay', { item: item })"
+
+                    >
+                    <span class="radio-label__fake-input"></span>
+                </label>
+
+
                 <button
                     class="close-btn"
                     @click.stop="onBtnCloseClick(item, $event.target)"
                 >
-                    -
                 </button>
 
-                <input
-                    :checked="$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === item"
-                    type="radio"
-                    name="group"
-                    :value="item.name"
-                    @change="$store.commit('selectToDisplay', { item: item })"
-                    @click.stop
-                />
                 <h2 class="item-name">
                     {{ item.name }}
                 </h2>
@@ -50,7 +54,6 @@
                     class="remove-btn"
                     @click.stop="onBtnRemoveClick(item)"
                 >
-                    X
                 </button>
             </div>
 
@@ -191,11 +194,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-.group-name, .item-header
-    height: 40px
-    display: flex
-    align-items: center
-    justify-content: space-between
+
 
 .list-item
     transition: all 0.3s ease
@@ -204,10 +203,110 @@ export default {
     box-sizing: border-box
     overflow: hidden
 
+    .item-header
+        height: 40px
+        display: flex
+        align-items: center
+
+    &_item
+        .item-header
+            justify-content: space-between
+
     .item-name
         font-size: 14px
         color: inherit
+        white-space: nowrap
+        text-overflow: ellipsis
+        overflow: hidden
 
+    .radio-label
+        display: flex
+        width: 20px
+        height: 20px
+        justify-content: center
+        align-items: center
+        cursor: pointer
+        padding: 0
+        border-radius: 50%
+        margin-left: -3px
+        margin-right: 10px
+        flex-shrink: 0
+
+        input
+            opacity: 0
+            visibility: hidden
+            position: absolute
+        &__fake-input
+            position: relative
+            width: 14px
+            height: 14px
+            border-radius: 50%
+            background-color: #D9D9D9
+            &:after
+                content: ""
+                position: absolute
+                top: 50%
+                left: 50%
+                width: 8px
+                height: 8px
+                background-color: #716B6B
+                border-radius: 50%
+                transform: translate(-50%, -50%)
+
+        input:checked + .radio-label__fake-input
+            &:after
+                background-color: #0062F1
+
+    .close-btn, .remove-btn
+        display: block
+        width: 20px
+        height: 20px
+        background-color: transparent
+        border: none
+        box-shadow: none
+        margin-right: 10px
+        position: relative
+        cursor: pointer
+        flex-shrink: 0
+        &:before, &:after
+            content: ""
+            position: absolute
+            width: 14px
+            height: 14px
+            top: 3px
+            left: 3px
+            background-image: url("../../resources/opened-folder.svg")
+            opacity: 1
+            background-position: center
+            background-repeat: no-repeat
+            background-size: contain
+
+        &:after
+            background-image: url("../../resources/closed-folder.svg")
+            width: 13px
+            opacity: 0
+
+    .remove-btn
+        &:before
+            background-image: url("../../resources/closed-trash.svg")
+        &:after
+            background-image: url("../../resources/opened-trash.svg")
+            top: 1px
+            width: 14px
+            height: 16px
+        &:hover
+            &:before
+                opacity: 0
+            &:after
+                opacity: 1
+
+
+    &_closed
+        .close-btn
+            &:before
+                opacity: 0
+            &:after
+                opacity: 1
     &_selected
         & > .item-header
             color: blue
@@ -220,40 +319,28 @@ export default {
         background-color: #F4F5F5
         border-bottom: 1px solid #EAEAEB
 
-    &_parent.list-item_drop-target_self:after
-        left: 30px
-        right: 30px
-        top: 40px
-
+    &_drag-target
+        opacity: 0.5
+        background-color: rgba(#0062F1, 0.3)
     &_drop-target
-        z-index: 50
-
-        &_top:after, &_bottom:after, &_self:after
+        &:after
             content: ""
             position: absolute
-            top: -1px
-            left: 20px
-            right: 20px
-            height: 2px
-            z-index: 10
-            background-color: #000
+            inset: 0
+            border: 5px solid transparent
             pointer-events: none
+        &_top:after
+            border-top-color: rgba(#0062F1, 0.5)
+
 
         &_bottom:after
-            top: auto
-            bottom: -1px
+            border-bottom-color: rgba(#0062F1, 0.5)
 
         &_self:after
-            top: 50%
-            margin-top: -1px
+            border-color: rgba(#0062F1, 0.5)
 
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
-
-@keyframes anim
-    0%
-        display: initial
-    100%
-        display: none
 </style>
+
