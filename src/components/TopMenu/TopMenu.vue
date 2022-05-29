@@ -7,7 +7,7 @@
         <div class="redact-center">
             <label v-if="$store.getters.selectedItem.redact" @click.stop>
                 Name:
-                <input type="text" :value="redact" @input="redactName($event.target.value)">
+                <input type="text" :value="redact" @input="redactName($event.target.value)" @keydown.enter="$event.target.blur()">
             </label>
         </div>
     </div>

@@ -136,6 +136,8 @@ export default {
             }
             const dragIndexes = findIndexes(this.items, dragTarget);
 
+            const scene = this.items[dragIndexes[0]];
+
             this.$store.commit("removeItemByIndexes", { indexes: dragIndexes });
 
             const dropIndexes = findIndexes(this.items, dropTarget);
@@ -154,7 +156,11 @@ export default {
 
             // Перехватить только items, если scene пытается быть вставленной в другую scene
             const isOnlyItemsNeeded = this.isOnlyItemsNeeded(dragTarget, dropTargetPlace);
-            dragTarget = isOnlyItemsNeeded ? dragTarget.items : dragTarget;
+            if (isOnlyItemsNeeded) {
+                const items = dragTarget.items;
+                dragTarget.items = [];
+                dragTarget = items;
+            }
 
             // dragTarget должен быть массивом
             dragTarget = Array.isArray(dragTarget) ? dragTarget : [dragTarget];
@@ -162,14 +168,14 @@ export default {
             this.$store.commit("insert", { itemsToInsert: dragTarget, indexes: dropIndexes });
 
             // Удаление пустой группы
-            this.tryToRemoveEmptyScene(dragIndexes[0]);
+            this.tryToRemoveEmptyScene(scene);
         },
 
         onBtnRemoveClick(item) {
             const indexes = findIndexes(this.items, item);
 
             const nestedItems = item.items;
-
+            const scene = this.items[indexes[0]];
             this.$store.commit("removeItemByIndexes", { indexes: indexes });
             this.$store.commit("insert", { itemsToInsert: nestedItems, indexes: indexes });
 
@@ -178,19 +184,17 @@ export default {
             }
 
             // Удаление пустой группы
-            this.tryToRemoveEmptyScene(indexes[0]);
+            this.tryToRemoveEmptyScene(scene);
         },
 
-        tryToRemoveEmptyScene(index) {
+        tryToRemoveEmptyScene(scene) {
             // Удаление пустой группы
-            const itemToRemove = this.items[index];
-
-            if (itemToRemove?.items.length === 0) {
-                this.$store.commit("removeItem", { item: itemToRemove });
-                if (this.$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === itemToRemove) {
+            if (scene?.items.length === 0) {
+                this.$store.commit("removeItem", { item: scene });
+                if (this.$store.getters.selectedItem[LIST_ITEM_TO_DISPLAY] === scene) {
                     this.$store.commit("unselectToDisplay");
                 }
-                if (this.$store.getters.selectedItem[LIST_ITEM_TO_REDACT] === itemToRemove) {
+                if (this.$store.getters.selectedItem[LIST_ITEM_TO_REDACT] === scene) {
                     this.$store.commit("unselectToRedact");
                 }
             }

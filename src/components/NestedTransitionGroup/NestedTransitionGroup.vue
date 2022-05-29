@@ -167,11 +167,6 @@ export default {
             return LIST_ITEM_TO_DISPLAY;
         }
     },
-    watch: {
-        animationLevel() {
-            console.log(this.animationLevel);
-        }
-    },
     methods: {
         getHeight(item) {
             const height = 40;
@@ -211,6 +206,7 @@ export default {
     padding: 0 10px
     box-sizing: border-box
     overflow: hidden
+    cursor: pointer
 
     .item-header
         height: 40px

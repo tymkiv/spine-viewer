@@ -22,9 +22,9 @@ import { LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../constants";
  * Returns the removed item.
  * @param {Indexes} indexes
  * @param {Items} items
- * @returns {Item}
  */
 const removeItemByIndexes = ({ items }, { indexes }) => {
+    if (!indexes) return;
     for (let i = 0; i < indexes.length - 1; i++) {
         items = items[indexes[i]].items;
     }
@@ -37,11 +37,10 @@ const removeItemByIndexes = ({ items }, { indexes }) => {
  * Returns the removed item.
  * @param {Item} item
  * @param {Items} items
- * @returns {Item}
  */
 const removeItem = ({ items }, { item }) => {
     const indexes = findIndexes(items, item);
-    return removeItemByIndexes({ items }, { indexes });
+    removeItemByIndexes({ items }, { indexes });
 };
 
 /**
