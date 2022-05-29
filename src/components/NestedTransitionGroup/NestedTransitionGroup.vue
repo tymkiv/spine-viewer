@@ -9,10 +9,10 @@
             :class="itemsClass[index]"
             :style="{ height: `${item._closed ? 40 : itemsHeight[index]}px` }"
             draggable="true"
-            @dragstart.stop="dragstart(item)"
+            @dragstart.stop="dragstart(item, nestedLevel)"
             @dragover.stop.prevent="dragover(item, $event)"
             @dragleave.stop="dragleave()"
-            @dragend.stop="dragend()"
+            @dragend.stop=" dragend()"
             @click.stop="onItemSelect(item)"
         >
             <div
@@ -61,6 +61,7 @@
                 v-if="item.items"
                 :items="item.items"
                 :nested-level="nestedLevel + 1"
+                :animation-level="animationLevel"
                 :dragstart="dragstart"
                 :dragover="dragover"
                 :dragleave="dragleave"
@@ -87,6 +88,10 @@ export default {
             required: true
         },
         nestedLevel: {
+            type: Number,
+            required: true
+        },
+        animationLevel: {
             type: Number,
             required: true
         },
@@ -144,7 +149,8 @@ export default {
                     "list-item_drop-target": this.dropTarget === item,
                     "list-item_drop-target_top": this.dropTarget === item && this.dropTargetPlace === "top",
                     "list-item_drop-target_bottom": this.dropTarget === item && this.dropTargetPlace === "bottom",
-                    "list-item_drop-target_self": this.dropTarget === item && this.dropTargetPlace === "self"
+                    "list-item_drop-target_self": this.dropTarget === item && this.dropTargetPlace === "self",
+                    "list-item_disable-animation": this.nestedLevel > this.animationLevel
                 }
             ]);
         },
@@ -159,6 +165,11 @@ export default {
         },
         LIST_ITEM_TO_DISPLAY() {
             return LIST_ITEM_TO_DISPLAY;
+        }
+    },
+    watch: {
+        animationLevel() {
+            console.log(this.animationLevel);
         }
     },
     methods: {
@@ -194,8 +205,6 @@ export default {
 </script>
 
 <style scoped lang="sass">
-
-
 .list-item
     transition: all 0.3s ease
     position: relative
@@ -207,6 +216,9 @@ export default {
         height: 40px
         display: flex
         align-items: center
+
+    &_disable-animation
+        transition: none
 
     &_item
         .item-header

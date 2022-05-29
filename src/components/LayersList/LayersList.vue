@@ -3,6 +3,7 @@
         class="layers-list"
         :items="items"
         :nested-level="0"
+        :animation-level="animationLevel"
         :dragstart="dragstart"
         :dragover="dragover"
         :dragleave="dragleave"
@@ -18,6 +19,7 @@
 
 <script>
 import { v4 } from "uuid";
+import gsap from "gsap";
 
 import NestedTransitionGroup from "../NestedTransitionGroup";
 import { includes, findIndexes } from "../../utils";
@@ -36,7 +38,9 @@ export default {
         return {
             dragTarget: null,
             dropTarget: null,
-            dropTargetPlace: null
+            dropTargetPlace: null,
+            animationLevel: Infinity,
+            delayedCall: null
         };
     },
 
@@ -51,8 +55,9 @@ export default {
     },
 
     methods: {
-        dragstart(item) {
+        dragstart(item, nestedLevel) {
             this.dragTarget = item;
+            this.animationLevel = nestedLevel;
         },
 
         dragend() {
@@ -61,6 +66,8 @@ export default {
             this.dragTarget = null;
             this.dropTarget = null;
             this.dropTargetPlace = null;
+            this.delayedCall?.kill();
+            this.delayedCall = gsap.delayedCall(0.3, () => this.animationLevel = Infinity);
         },
 
         dragover(dropTarget, e) {

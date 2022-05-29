@@ -19,6 +19,7 @@
     "eslint-plugin-vue": "^9.0.1",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "netlify": "^11.0.1",
     "parcel": "^2.5.0",
     "rimraf": "^3.0.2"
   },
