@@ -1,5 +1,7 @@
 <template>
-    <div @click="appClick">
+    <div
+        :class="{'grabbing': $store.state.grabbing}"
+    >
         <settings-menu />
 
         <top-menu />
@@ -63,9 +65,29 @@ export default {
         ResourcesMenu,
         TimelineMenu
     },
+    mounted() {
+        window.addEventListener("mousemove", this.appMousemove);
+        window.addEventListener("mouseup", this.appMouseup);
+        window.addEventListener("click", this.appClick);
+        window.addEventListener("resize", this.appResize);
+    },
+    unmounted() {
+        window.removeEventListener("mousemove", this.appMousemove);
+        window.removeEventListener("mouseup", this.appMouseup);
+        window.removeEventListener("click", this.appClick);
+    },
     methods: {
-        appClick() {
-            this.$store.state.appClickListeners.forEach(cb => cb());
+        appClick(event) {
+            this.$store.state.appClickListeners.forEach(cb => cb(event));
+        },
+        appMousemove(event) {
+            this.$store.state.appListeners["mousemove"]?.forEach(cb => cb(event));
+        },
+        appMouseup(event) {
+            this.$store.state.appListeners["mouseup"]?.forEach(cb => cb(event));
+        },
+        appResize(event) {
+            this.$store.state.appListeners["resize"]?.forEach(cb => cb(event));
         }
     }
 };
@@ -77,6 +99,8 @@ export default {
 </style>
 
 <style lang="sass">
+.grabbing, .grabbing *
+    cursor: grabbing!important
 .splitpanes__splitter
     position: relative
 

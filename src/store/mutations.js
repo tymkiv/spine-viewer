@@ -86,8 +86,35 @@ export default {
         state.appClickListeners = state.appClickListeners.filter((cb) => cb !== callback);
     },
 
+    addAppListener(state, { type, callback, once = false }) {
+        const coveredCallback = once
+            ? () => { callback(); state.appClickListeners = state.appClickListeners.filter((cb) => cb !== coveredCallback); }
+            : callback;
+
+        state.appListeners[type] ||= [];
+        state.appListeners[type].push(coveredCallback);
+    },
+
+    removeAppListener(state, { type, callback }) {
+        state.appListeners[type] ||= [];
+        state.appListeners[type] = state.appListeners[type].filter((cb) => cb !== callback);
+    },
+
+    grabbing(state, { value }) {
+        state.grabbing = value;
+    },
+
     redactName(state, { value }) {
         state._selectedItem[LIST_ITEM_TO_REDACT].name = value;
+    },
+
+    addPlateToSpine(state, { item, plate }) {
+        // item.plates.push(plate);
+        insert({ items: item.plates }, { itemsToInsert: [plate], indexes: [item.plates.length] });
+    },
+
+    removePlateFromSpine(state, { item, plate }) {
+        removeItem({ items: item.plates }, { item: plate });
     },
 
     removeItem,

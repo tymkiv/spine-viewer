@@ -57,3 +57,15 @@ export const findIndexes = (items, item) => {
 
     return null;
 };
+
+export const flat = (items) => {
+    const result = [];
+
+    if (items) {
+        for (let i = 0; i < items.length; i++) {
+            result.push({ ...items[i], items: [] }, ...flat(items[i].items));
+        }
+    }
+
+    return result;
+};

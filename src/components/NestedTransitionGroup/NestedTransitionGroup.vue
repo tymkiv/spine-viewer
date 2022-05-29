@@ -50,11 +50,7 @@
                     {{ item.name }}
                 </h2>
 
-                <button
-                    class="remove-btn"
-                    @click.stop="onBtnRemoveClick(item)"
-                >
-                </button>
+                <btn-remove @click.stop="onBtnRemoveClick(item)"/>
             </div>
 
             <nested-transition-group
@@ -78,10 +74,12 @@
 <script>
 import gsap from "gsap";
 
+import BtnRemove from "../BtnRemove";
 import { LIST_ITEM_TYPE_ITEM, LIST_ITEM_TYPE_SCENE, LIST_ITEM_TO_REDACT, LIST_ITEM_TO_DISPLAY } from "../../constants";
 
 export default {
     name: "NestedTransitionGroup",
+    components: { BtnRemove },
     props: {
         items: {
             type: Array,
@@ -265,7 +263,7 @@ export default {
             &:after
                 background-color: #0062F1
 
-    .close-btn, .remove-btn
+    .close-btn
         display: block
         width: 20px
         height: 20px
@@ -294,19 +292,7 @@ export default {
             width: 13px
             opacity: 0
 
-    .remove-btn
-        &:before
-            background-image: url("../../resources/closed-trash.svg")
-        &:after
-            background-image: url("../../resources/opened-trash.svg")
-            top: 1px
-            width: 14px
-            height: 16px
-        &:hover
-            &:before
-                opacity: 0
-            &:after
-                opacity: 1
+
 
 
     &_closed
@@ -320,12 +306,12 @@ export default {
             color: blue
 
     &_color-1
-        background-color: #EAEAEB
-        border-bottom: 1px solid #F4F5F5
+        background-color: #EAEAEC
+        border-bottom: 1px solid #F5F5F5
 
     &_color-2
-        background-color: #F4F5F5
-        border-bottom: 1px solid #EAEAEB
+        background-color: #F5F5F5
+        border-bottom: 1px solid #EAEAEC
 
     &_drag-target
         opacity: 0.5

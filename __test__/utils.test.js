@@ -1,4 +1,4 @@
-import { includes, findIndexes } from "../src/utils";
+import { includes, findIndexes, flat } from "../src/utils";
 
 describe("findIndexes", () => {
     const item = { a: "find" };
@@ -30,5 +30,23 @@ describe("includes", () => {
         { item, items: [{ a: "a", items: [{ a: "b", items: [{ a: "c" }, item] }] }], result: true }
     ])("%j", ({ item, items, result }) => {
         expect(includes(items, item)).toBe(result);
+    });
+});
+
+describe("flat", () => {
+    test.each([
+        { items: [{ a: "a" }], expected: [{ a: "a", items: [] }] },
+        { items: [{ a: "a" }, { a: "b" }], expected: [{ a: "a", items: [] }, { a: "b", items: [] }] },
+        { items: [{ a: "a", items: [{ a: "b" }] }], expected: [{ a: "a", items: [] }, { a: "b", items: [] }] },
+        {
+            items: [{ a: "a", items: [{ a: "b" }] }, { a: "c" }],
+            expected: [{ a: "a", items: [] }, { a: "b", items: [] }, { a: "c", items: [] }]
+        },
+        {
+            items: [{ a: "a", items: [{ a: "b", items: [{ a: "aa" }] }] }, { a: "c" }],
+            expected: [{ a: "a", items: [] }, { a: "b", items: [] }, { a: "aa", items: [] }, { a: "c", items: [] }]
+        }
+    ])("%j", ({ items, expected }) => {
+        expect(flat(items)).toEqual(expected);
     });
 });
