@@ -50,8 +50,8 @@ export default {
     emits: ["scrollLeft", "removeClick"],
     data() {
         return {
-            maxSpeed: 5, // максимальная скорость расширения и скролла, при перетаскивании thumb за границы
-            tensionRange: 15, // ширина "натяжения"
+            maxSpeed: 15, // максимальная скорость расширения и скролла, при перетаскивании thumb за границы
+            tensionRange: 50, // ширина "натяжения"
             deltaX: 0,
             startX: 0,
             x: 0,
@@ -116,6 +116,11 @@ export default {
             this.rightBorder = Math.max(this.rightBorder, rightBorderMinThreshold);
             this.leftBorder = Math.min(this.leftBorder, leftBorderMinThreshold);
             this.x = Math.max(this.x, 0);
+
+            // if (this.x > 490 && this.x < 510) { // todo: привязка к определенной точке
+            //     gsap.set(this.$refs.wrapper, { x: 500 });
+            //     return;
+            // }
 
             gsap.set(this.$refs.wrapper, { x: this.x });
             this.lastX = this.x - this.deltaX;

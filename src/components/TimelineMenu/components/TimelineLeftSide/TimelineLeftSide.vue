@@ -78,6 +78,8 @@ export default {
     height: 100%
     background-color: #F4F5F5
     position: relative
+    z-index: 10
+
 .header
     height: 25px
     display: flex
@@ -97,13 +99,13 @@ export default {
 .list-item
     transition: all 0.3s ease
     &__wrapper
-        padding: 20px 5px
+        padding: 20px 5px 40px
         box-sizing: border-box
         height: 100%
     &__plate
         border-radius: 5px
         box-shadow: var(--shadow)
-        height: 40px
+        height: 30px
         display: flex
         align-items: center
         padding: 0 10px
