@@ -113,7 +113,7 @@ export default {
     background-color: #F6F6F7
 
 .list-wrapper
-    overflow: auto
+    overflow: scroll
 
     height: calc(100% - 25px)
 
