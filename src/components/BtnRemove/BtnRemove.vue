@@ -1,5 +1,8 @@
 <template>
-    <button class="remove-btn" :class="{'stop': $store.state.grabbing}"></button>
+    <button
+        class="remove-btn"
+        :class="{'stop': $store.getters['app/cursorGrabbing']}"
+    />
 </template>
 
 

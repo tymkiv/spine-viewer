@@ -1,12 +1,31 @@
+// import { createStore } from "vuex";
+// import mutations from "./mutations";
+// import state from "./state";
+// import getters from "./getters";
+//
+// export default createStore({
+//     modules: {
+//         layers: {
+//             state() {
+//                 return state;
+//             },
+//             mutations,
+//             getters
+//         }
+//     }
+// });
+
+
 import { createStore } from "vuex";
-import mutations from "./mutations";
-import state from "./state";
-import getters from "./getters";
+import app from "./modules/app";
+import layers from "./modules/layers";
+import resources from "./modules/resources";
 
 export default createStore({
-    state() {
-        return state;
-    },
-    mutations,
-    getters
+    // strict: true,
+    modules: {
+        app,
+        layers,
+        resources
+    }
 });

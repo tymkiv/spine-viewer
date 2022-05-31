@@ -1,6 +1,6 @@
 <template>
     <div
-        :class="{'grabbing': $store.state.grabbing}"
+        :class="{'grabbing': cursorGrabbing}"
     >
         <settings-menu />
 
@@ -23,7 +23,7 @@
                         <layers-menu />
                     </split-pane>
 
-                    <split-pane min-size="20"></split-pane>
+                    <split-pane min-size="20" />
 
                     <split-pane
                         size="20"
@@ -48,11 +48,11 @@
 
 <script>
 import { Splitpanes as SplitContainer, Pane as SplitPane } from "splitpanes";
-import SettingsMenu from "../SettingsMenu";
-import TopMenu from "../TopMenu";
-import LayersMenu from "../LayersMenu";
-import TimelineMenu from "../TimelineMenu";
-import ResourcesMenu from "../ResourcesMenu";
+import SettingsMenu from "./components/SettingsMenu";
+import TopMenu from "./components/TopMenu";
+import LayersMenu from "./components/LayersMenu";
+import TimelineMenu from "./components/TimelineMenu";
+import ResourcesMenu from "./components/ResourcesMenu";
 import "splitpanes/dist/splitpanes.css";
 
 export default {
@@ -65,29 +65,27 @@ export default {
         ResourcesMenu,
         TimelineMenu
     },
+    computed: {
+        cursorGrabbing() {
+            console.log(this.$store.getters["app/cursorGrabbing"]);
+            return this.$store.getters["app/cursorGrabbing"];
+        }
+    },
     mounted() {
-        window.addEventListener("mousemove", this.appMousemove);
-        window.addEventListener("mouseup", this.appMouseup);
-        window.addEventListener("click", this.appClick);
-        window.addEventListener("resize", this.appResize);
+        window.addEventListener("mousemove", this.dispatch);
+        window.addEventListener("mouseup", this.dispatch);
+        window.addEventListener("click", this.dispatch);
+        window.addEventListener("resize", this.dispatch);
     },
     unmounted() {
-        window.removeEventListener("mousemove", this.appMousemove);
-        window.removeEventListener("mouseup", this.appMouseup);
-        window.removeEventListener("click", this.appClick);
+        window.removeEventListener("mousemove", this.dispatch);
+        window.removeEventListener("mouseup", this.dispatch);
+        window.removeEventListener("click", this.dispatch);
     },
+
     methods: {
-        appClick(event) {
-            this.$store.state.appClickListeners.forEach(cb => cb(event));
-        },
-        appMousemove(event) {
-            this.$store.state.appListeners["mousemove"]?.forEach(cb => cb(event));
-        },
-        appMouseup(event) {
-            this.$store.state.appListeners["mouseup"]?.forEach(cb => cb(event));
-        },
-        appResize(event) {
-            this.$store.state.appListeners["resize"]?.forEach(cb => cb(event));
+        dispatch(event) {
+            this.$store.getters["app/listeners"][event.type]?.forEach(cb => cb(event));
         }
     }
 };
