@@ -1,5 +1,5 @@
 <template>
-    <div class="settings-menu"></div>
+    <div class="settings-menu" />
 </template>
 
 <style scoped lang="sass">

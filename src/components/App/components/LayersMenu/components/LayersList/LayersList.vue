@@ -61,6 +61,10 @@ export default {
         },
 
         dragover(dropTarget, e) {
+            if (!dropTarget?.type || !this.dragTarget?.type) return;
+
+            console.log("dragover, LayersList");
+
             this.dropTarget = dropTarget;
 
             // Переводим попытки вставить scene в item

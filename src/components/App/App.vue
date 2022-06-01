@@ -47,13 +47,14 @@
 </template>
 
 <script>
+import "splitpanes/dist/splitpanes.css";
 import { Splitpanes as SplitContainer, Pane as SplitPane } from "splitpanes";
 import SettingsMenu from "./components/SettingsMenu";
 import TopMenu from "./components/TopMenu";
 import LayersMenu from "./components/LayersMenu";
 import TimelineMenu from "./components/TimelineMenu";
 import ResourcesMenu from "./components/ResourcesMenu";
-import "splitpanes/dist/splitpanes.css";
+import BootManager from "./components/BootManager";
 
 export default {
     components: {
@@ -76,11 +77,24 @@ export default {
         window.addEventListener("mouseup", this.dispatch);
         window.addEventListener("click", this.dispatch);
         window.addEventListener("resize", this.dispatch);
+
+        window.addEventListener("dragenter", this.dispatch, true);
+        window.addEventListener("dragover", this.dispatch, true);
+        window.addEventListener("dragleave", this.dispatch, true);
+        window.addEventListener("drop", this.dispatch, true);
+
+        new BootManager(this.$store);
     },
     unmounted() {
         window.removeEventListener("mousemove", this.dispatch);
         window.removeEventListener("mouseup", this.dispatch);
         window.removeEventListener("click", this.dispatch);
+        window.removeEventListener("resize", this.dispatch);
+
+        window.removeEventListener("dragenter", this.dispatch);
+        window.removeEventListener("dragover", this.dispatch);
+        window.removeEventListener("dragleave", this.dispatch);
+        window.removeEventListener("drop", this.dispatch);
     },
 
     methods: {

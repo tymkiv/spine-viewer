@@ -3,6 +3,8 @@
         tag="ul"
         name="list"
         class="list"
+        @dragover.stop.prevent="dragover({type: 'list'}, $event)"
+        @dragleave.stop="dragleave()"
     >
         <li
             v-for="item in items"
@@ -30,7 +32,7 @@
                 >
                 <span class="fake-checkbox" />
                 <span class="name"> {{ item.name }} </span>
-                <btn-remove />
+                <btn-remove @click.stop="remove(item)" />
             </label>
         </li>
     </transition-group>
@@ -57,13 +59,11 @@ export default {
     methods: {
         pickedChange(checked, item) {
             this.$store.dispatch("resources/changeChecked", { checked, item });
-            // if (checked) {
-            //     this.$store.dispatch("resources/changeChecked", { checked, item });
-            //     // this.$store.commit("resourcesAddPicked", { item });
-            // } else {
-            //     this.$store.commit("resourcesRemovePicked", { item });
-            // }
+        },
 
+        remove(item) {
+            this.$store.dispatch("resources/changeChecked", { checked: false, item });
+            this.$store.dispatch("resources/removeItem", item);
         },
 
         dragstart(item) {
@@ -79,7 +79,11 @@ export default {
         },
 
         dragover(dropTarget, e) {
+            if (!dropTarget?.type || !this.dragTarget?.type) return;
+
             this.dropTarget = dropTarget;
+
+            console.log("dragover, ResourcesList");
 
             // Попытка вставить себя в себя
             if (this.dragTarget === this.dropTarget) {
@@ -141,6 +145,10 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.list-enter-from, .list-leave-to
+    opacity: 0
+    height: 0 !important
+
 .list
     min-height: 100%
     background-image: url("resources/pattern.svg")
@@ -148,9 +156,30 @@ export default {
     background-repeat: repeat
 .list-item
     height: 40px
-    //padding: 0 10px
+    position: relative
     display: flex
     align-items: center
+    transition: 0.3s ease
+
+    &_drag-target
+        opacity: 0.5
+        background-color: rgba(#0062F1, 0.3)
+    &_drop-target
+        &:after
+            content: ""
+            position: absolute
+            inset: 0
+            border: 5px solid transparent
+            pointer-events: none
+        &_top:after
+            border-top-color: rgba(#0062F1, 0.5)
+
+
+        &_bottom:after
+            border-bottom-color: rgba(#0062F1, 0.5)
+
+        &_self:after
+            border-color: rgba(#0062F1, 0.5)
 
 
 .label
