@@ -63,7 +63,9 @@ export const flat = (items) => {
 
     if (items) {
         for (let i = 0; i < items.length; i++) {
-            result.push({ ...items[i], items: [] }, ...flat(items[i].items));
+            if (items[i].spine) {
+                result.push({ ...items[i], items: [] }, ...flat(items[i].items));
+            }
         }
     }
 

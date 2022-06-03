@@ -18,11 +18,27 @@
                 >
             </label>
         </div>
+
+        <input
+            type="file"
+            multiple
+            webkitdirectory
+            directory
+            @change="onChange($event)"
+        >
+
+        <input
+            type="file"
+            multiple
+            @change="onChange($event)"
+        >
     </div>
 </template>
 
 <script>
 export default {
+    emits: ["on-load-items"],
+
     computed: {
         itemToRedact() {
             return this.$store.getters["layers/itemToRedact"];
@@ -32,6 +48,11 @@ export default {
     methods: {
         redactItem(name) {
             this.$store.dispatch("layers/redactItem", name);
+        },
+        onChange(event) {
+            this.$emit("on-load-items", event.target.files);
+            event.target.files = null;
+            event.target.value = "";
         }
     }
 };

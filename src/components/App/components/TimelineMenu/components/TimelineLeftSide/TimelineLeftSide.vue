@@ -60,7 +60,7 @@ export default {
         getHeight(item) {
             const height = 90;
 
-            return height * (item.animations.length + 1);
+            return height * (item.animations?.length + 1);
         }
     }
 };

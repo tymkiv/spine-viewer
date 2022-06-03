@@ -4,7 +4,7 @@
             <h2 class="resources-menu__title">
                 Resources
             </h2>
-            <button class="resources-menu__btn">
+            <button @click="createClick" class="resources-menu__btn">
                 Create layer(s)
             </button>
         </div>
@@ -17,8 +17,50 @@
 
 <script>
 import ResourcesList from "./components/ResourcesList/ResourcesList";
+import { v4 } from "uuid";
+import * as PIXI from "pixi.js";
 export default {
-    components: { ResourcesList }
+    components: { ResourcesList },
+    methods: {
+        createClick() {
+            const layers = this.$store.getters["resources/checkedItems"].map(resource => {
+                const layer = {
+                    type: "item",
+                    name: resource.name,
+                    id: v4()
+                };
+                if (resource.spineData) {
+
+                    const probableAnimations = resource.spineData.animations.map(animation => ({
+                        name: animation.name,
+                        duration: animation.duration,
+                        id: v4()
+                    }));
+
+                    layer.spindeData = resource.spineData;
+                    layer.spine = new PIXI.spine.Spine(resource.spineData);
+                    layer.probableAnimations = probableAnimations;
+                    layer.animations = [{ timeStart: 0, pickedAnimation: probableAnimations[0], id: v4() }];
+                }
+
+                if (resource.texture) {
+                    layer.sprite = new PIXI.Sprite(resource.texture);
+                }
+
+                return layer;
+            });
+
+            const scene = {
+                type: "scene",
+                name: "Scene",
+                id: v4(),
+                items: layers
+            };
+            if (layers.length) {
+                this.$store.dispatch("layers/loadItems", [scene]);
+            }
+        }
+    }
 };
 </script>
 

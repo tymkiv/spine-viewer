@@ -5,19 +5,19 @@
         @mouseup="dispatch($event)"
         @click="dispatch($event)"
 
-        @dragenter.capture="dispatch($event)"
-        @dragover.capture="dispatch($event)"
-        @dragleave.capture="dispatch($event)"
-        @drop.capture="dispatch($event)"
+        @dragenter.capture.prevent="onDragenter($event)"
+        @dragover.capture.prevent="onDragover($event)"
+        @dragleave.capture.prevent="onDragleave($event)"
+        @drop.capture.prevent="onDrop($event)"
     >
-        <boot-menu
-            v-if="$store.getters['app/bootOver']"
+        <boot-overlay
+            v-if="bootOver"
             class="boot-menu"
         />
 
         <settings-menu />
 
-        <top-menu />
+        <top-menu @on-load-items="handleFiles" />
 
         <split-container
             :dbl-click-splitter="false"
@@ -62,44 +62,101 @@
 <script>
 import "splitpanes/dist/splitpanes.css";
 import { Splitpanes as SplitContainer, Pane as SplitPane } from "splitpanes";
-import BootMenu from "./components/BootMenu";
+import BootOverlay from "./components/BootOverlay";
 import SettingsMenu from "./components/SettingsMenu";
 import TopMenu from "./components/TopMenu";
 import LayersMenu from "./components/LayersMenu";
 import TimelineMenu from "./components/TimelineMenu";
 import ResourcesMenu from "./components/ResourcesMenu";
-import BootManager from "./components/BootManager";
+import {
+    fileReader,
+    itemsReader,
+    prepareItemsForLayersMenu,
+    prepareItemsForResourceMenu
+} from "../../BootManager";
 
 export default {
     components: {
         SplitContainer,
         SplitPane,
-        BootMenu,
+        BootOverlay,
         SettingsMenu,
         TopMenu,
         LayersMenu,
         ResourcesMenu,
         TimelineMenu
     },
+    data() {
+        return {
+            bootOver: false
+        };
+    },
     computed: {
         cursorGrabbing() {
-            console.log(this.$store.getters["app/cursorGrabbing"]);
             return this.$store.getters["app/cursorGrabbing"];
         }
     },
     mounted() {
         window.addEventListener("resize", this.dispatch);
-
-        new BootManager(this.$store);
     },
     unmounted() {
         window.removeEventListener("resize", this.dispatch);
     },
 
+
     methods: {
         dispatch(event) {
             this.$store.getters["app/listeners"][event.type]?.forEach(cb => cb(event));
+        },
+        showBootOver() {
+            this.bootOver = true;
+        },
+        hideBootOver() {
+            this.bootOver = false;
+        },
+        onDragenter(event) {
+            if (event.dataTransfer.items.length) {
+                event.stopPropagation();
+                this.showBootOver();
+            }
+        },
+        onDragover(event) {
+            if (event.dataTransfer.items.length) {
+                event.stopPropagation();
+                this.showBootOver();
+            }
+        },
+        onDragleave(event) {
+            if (event.dataTransfer.items.length) {
+                event.stopPropagation();
+                this.hideBootOver();
+            }
+        },
+        onDrop(event) {
+            if (event.dataTransfer.items.length) {
+                event.stopPropagation();
+                this.hideBootOver();
+                this.handleItems(event.dataTransfer.items);
+            }
+        },
+        async handleItems(items) {
+            const files = await itemsReader(items);
+
+            this.prepareItems(files);
+        },
+        async handleFiles(rawFiles) {
+            const files = await fileReader(rawFiles);
+
+            this.prepareItems(files);
+        },
+        prepareItems(files) {
+            const layersItems = prepareItemsForLayersMenu(files);
+            const resourceItems = prepareItemsForResourceMenu(layersItems);
+
+            this.$store.dispatch("layers/loadItems", layersItems);
+            this.$store.dispatch("resources/loadItems", resourceItems);
         }
+
     }
 };
 </script>

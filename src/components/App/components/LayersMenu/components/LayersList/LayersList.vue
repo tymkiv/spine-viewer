@@ -1,20 +1,25 @@
 <template>
-    <nested-transition-group
-        class="layers-list"
-        :items="items"
-        :nested-level="0"
-        :animation-level="animationLevel"
-        :dragstart="dragstart"
-        :dragover="dragover"
-        :dragleave="dragleave"
-        :dragend="dragend"
-        :on-btn-remove-click="onBtnRemoveClick"
-        :drag-target="dragTarget"
-        :drop-target="dropTarget"
-        :drop-target-place="dropTargetPlace"
-        @dragover.stop.prevent="dragover({type: 'list'}, $event)"
-        @dragleave.stop="dragleave()"
-    />
+    <div
+        ref="wrapper"
+        class="layers-list__wrapper"
+    >
+        <nested-transition-group
+            class="layers-list"
+            :items="items"
+            :nested-level="0"
+            :animation-level="animationLevel"
+            :dragstart="dragstart"
+            :dragover="dragover"
+            :dragleave="dragleave"
+            :dragend="dragend"
+            :on-btn-remove-click="onBtnRemoveClick"
+            :drag-target="dragTarget"
+            :drop-target="dropTarget"
+            :drop-target-place="dropTargetPlace"
+            @dragover.stop.prevent="dragover({type: 'list'}, $event)"
+            @dragleave.stop="dragleave($event)"
+        />
+    </div>
 </template>
 
 <script>
@@ -63,8 +68,6 @@ export default {
         dragover(dropTarget, e) {
             if (!dropTarget?.type || !this.dragTarget?.type) return;
 
-            console.log("dragover, LayersList");
-
             this.dropTarget = dropTarget;
 
             // Переводим попытки вставить scene в item
@@ -75,6 +78,7 @@ export default {
 
             // Попытка вставить себя в себя
             if (this.dragTarget === this.dropTarget) {
+                this.dropTarget = null;
                 return;
             }
 
@@ -82,8 +86,10 @@ export default {
             if (
                 this.dragTarget.type === "item" &&
                 this.dropTarget.type === "item" &&
+                this.dragTarget.items &&
                 includes(this.dragTarget.items, this.dropTarget)
             ) {
+                this.dropTarget = null;
                 return;
             }
 
@@ -119,9 +125,18 @@ export default {
             this.dropTargetPlace = y <= borderTop ? "top" : y >= borderBottom ? "bottom" : "self";
         },
 
-        dragleave() {
-            this.dropTarget = null;
-            this.dropTargetPlace = null;
+        dragleave(event) {
+            const { top, left, right, bottom } = this.$refs.wrapper.getBoundingClientRect();
+            if (
+                event.clientX < left ||
+                event.clientX > right ||
+                event.clientY > bottom ||
+                event.clientY < top
+            ) {
+                this.dropTarget = null;
+                this.dropTargetPlace = null;
+            }
+
         },
 
         dragTargetDropTarget(dragTarget, dropTarget, dropTargetPlace) {
@@ -174,7 +189,10 @@ export default {
             const scene = this.items[indexes[0]];
             this.$store.dispatch("layers/removeItemByIndexes", indexes);
             // this.$store.commit("removeItemByIndexes", { indexes: indexes });
-            this.$store.dispatch("layers/insert", { items: nestedItems, indexes });
+            if (nestedItems) {
+                this.$store.dispatch("layers/insert", { items: nestedItems, indexes });
+            }
+
             // this.$store.commit("insert", { itemsToInsert: nestedItems, indexes: indexes });
 
             if (this.$store.getters["layers/itemToRedact"] === item) {
@@ -233,5 +251,7 @@ export default {
 .layers-list
     min-height: 100%
     background-color: #EAEAEB
+    &__wrapper
+        height: 100%
 
 </style>

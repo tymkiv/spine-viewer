@@ -11,7 +11,7 @@
             draggable="true"
             @dragstart.stop="dragstart(item, nestedLevel)"
             @dragover.stop.prevent="dragover(item, $event)"
-            @dragleave.stop="dragleave()"
+            @dragleave.stop="dragleave($event)"
             @dragend.stop=" dragend()"
             @click.stop="onItemSelect(item)"
         >
@@ -159,7 +159,7 @@ export default {
                 ? item.items.reduce((height, nestedItem) => height + this.getHeight(nestedItem), 0)
                 : 0;
 
-            const pb = item.items.length ? 10 : 0;
+            const pb = item.items?.length ? 10 : 0;
 
             return height + nestedItemsHeight + pb;
         },
@@ -218,6 +218,7 @@ export default {
         white-space: nowrap
         text-overflow: ellipsis
         overflow: hidden
+        line-height: initial
 
     .radio-label
         display: flex

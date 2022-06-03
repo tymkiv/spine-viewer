@@ -83,8 +83,6 @@ export default {
 
             this.dropTarget = dropTarget;
 
-            console.log("dragover, ResourcesList");
-
             // Попытка вставить себя в себя
             if (this.dragTarget === this.dropTarget) {
                 return;
@@ -229,4 +227,5 @@ export default {
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
+    line-height: initial
 </style>
