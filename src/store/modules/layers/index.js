@@ -195,6 +195,10 @@ const mutations = {
     _REMOVE_ANIMATION_FROM_ITEM(state, { item, animation }) {
         const index = item.animations.findIndex(a => a === animation);
         item.animations.splice(index, 1);
+    },
+
+    _LOAD_ITEMS(state, items) {
+        state._ITEMS.push(...items);
     }
 };
 
@@ -237,6 +241,10 @@ const actions = {
 
     removeAnimationToItem({ commit }, { item, animation }) {
         commit("_REMOVE_ANIMATION_FROM_ITEM", { item, animation });
+    },
+
+    loadItems({ commit }, items) {
+        commit("_LOAD_ITEMS", items);
     }
 };
 

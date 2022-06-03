@@ -21,11 +21,17 @@
     "jest-environment-jsdom": "^28.1.0",
     "netlify": "^11.0.1",
     "parcel": "^2.5.0",
-    "rimraf": "^3.0.2"
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "querystring-es3": "^0.2.1",
+    "rimraf": "^3.0.2",
+    "url": "^0.11.0"
   },
   "dependencies": {
     "gsap": "^3.10.4",
     "lodash": "^4.17.21",
+    "pixi-spine": "^1.6.2",
+    "pixi.js": "4.8.8",
     "reset-css": "^5.0.1",
     "splitpanes": "^3.1.1",
     "uuid": "^8.3.2",

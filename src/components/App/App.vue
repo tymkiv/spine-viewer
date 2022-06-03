@@ -1,7 +1,20 @@
 <template>
     <div
         :class="{'grabbing': cursorGrabbing}"
+        @mousemove="dispatch($event)"
+        @mouseup="dispatch($event)"
+        @click="dispatch($event)"
+
+        @dragenter.capture="dispatch($event)"
+        @dragover.capture="dispatch($event)"
+        @dragleave.capture="dispatch($event)"
+        @drop.capture="dispatch($event)"
     >
+        <boot-menu
+            v-if="$store.getters['app/bootOver']"
+            class="boot-menu"
+        />
+
         <settings-menu />
 
         <top-menu />
@@ -49,6 +62,7 @@
 <script>
 import "splitpanes/dist/splitpanes.css";
 import { Splitpanes as SplitContainer, Pane as SplitPane } from "splitpanes";
+import BootMenu from "./components/BootMenu";
 import SettingsMenu from "./components/SettingsMenu";
 import TopMenu from "./components/TopMenu";
 import LayersMenu from "./components/LayersMenu";
@@ -60,6 +74,7 @@ export default {
     components: {
         SplitContainer,
         SplitPane,
+        BootMenu,
         SettingsMenu,
         TopMenu,
         LayersMenu,
@@ -73,28 +88,12 @@ export default {
         }
     },
     mounted() {
-        window.addEventListener("mousemove", this.dispatch);
-        window.addEventListener("mouseup", this.dispatch);
-        window.addEventListener("click", this.dispatch);
         window.addEventListener("resize", this.dispatch);
-
-        window.addEventListener("dragenter", this.dispatch, true);
-        window.addEventListener("dragover", this.dispatch, true);
-        window.addEventListener("dragleave", this.dispatch, true);
-        window.addEventListener("drop", this.dispatch, true);
 
         new BootManager(this.$store);
     },
     unmounted() {
-        window.removeEventListener("mousemove", this.dispatch);
-        window.removeEventListener("mouseup", this.dispatch);
-        window.removeEventListener("click", this.dispatch);
         window.removeEventListener("resize", this.dispatch);
-
-        window.removeEventListener("dragenter", this.dispatch);
-        window.removeEventListener("dragover", this.dispatch);
-        window.removeEventListener("dragleave", this.dispatch);
-        window.removeEventListener("drop", this.dispatch);
     },
 
     methods: {
@@ -108,6 +107,12 @@ export default {
 <style scoped lang="sass">
 .split-container
     height: calc(100vh - 80px)
+
+.boot-menu
+    position: absolute
+    inset: 0
+    z-index: 999
+    pointer-events: none
 </style>
 
 <style lang="sass">

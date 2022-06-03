@@ -47,7 +47,7 @@ export default {
     },
     computed: {
         items() {
-            return flat(this.$store.getters["layers/sceneToDisplay"].items);
+            return flat(this.$store.getters["layers/sceneToDisplay"]?.items);
         }
     },
     methods: {

@@ -1,6 +1,7 @@
 const index = {
     _LISTENERS: [],
-    _CURSOR_GRABBING: false
+    _CURSOR_GRABBING: false,
+    _BOOT_OVER: false
 };
 
 const getters = {
@@ -10,6 +11,10 @@ const getters = {
 
     cursorGrabbing(state) {
         return state._CURSOR_GRABBING;
+    },
+
+    bootOver(state) {
+        return state._BOOT_OVER;
     }
 };
 
@@ -26,6 +31,10 @@ const mutations = {
 
     _SET_CURSOR_GRABBING(state, value) {
         state._CURSOR_GRABBING = value;
+    },
+
+    _SET_BOOT_OVER(state, value) {
+        state._BOOT_OVER = value;
     }
 };
 
@@ -44,6 +53,10 @@ const actions = {
 
     setCursorGrabbing({ commit }, value) {
         commit("_SET_CURSOR_GRABBING", value);
+    },
+
+    setBootOver({ commit }, value) {
+        commit("_SET_BOOT_OVER", value);
     }
 };
 

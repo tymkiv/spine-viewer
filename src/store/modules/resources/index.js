@@ -55,6 +55,10 @@ const mutations = {
 
     _INSERT(state, { items, indexes }) {
         INSERT(state._ITEMS, { items, indexes });
+    },
+
+    _LOAD_ITEMS(state, items) {
+        state._ITEMS.push(...items);
     }
 };
 
@@ -73,6 +77,10 @@ const actions = {
 
     insert({ commit }, { items, indexes }) {
         commit("_INSERT", { items, indexes });
+    },
+
+    loadItems({ commit }, items) {
+        commit("_LOAD_ITEMS", items);
     }
 };
 
