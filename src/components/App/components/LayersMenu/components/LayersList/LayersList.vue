@@ -250,7 +250,7 @@ export default {
 <style scoped lang="sass">
 .layers-list
     min-height: 100%
-    background-color: #EAEAEB
+    background-color: var(--color-dark)
     &__wrapper
         height: 100%
 

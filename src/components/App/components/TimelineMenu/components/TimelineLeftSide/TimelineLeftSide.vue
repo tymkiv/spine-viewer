@@ -70,11 +70,12 @@ export default {
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
+    transform: translateY(-100%)
 .wrapper
     overflow: hidden
     box-shadow: var(--shadow)
     height: 100%
-    background-color: #F4F5F5
+    background-color: var(--color-light)
     position: relative
     z-index: 10
 
@@ -86,11 +87,10 @@ export default {
     font-size: 14px
     position: relative
     box-shadow: var(--shadow)
-    background-color: #F6F6F7
+    background-color: var(--color-light)
 
 .list-wrapper
     overflow: scroll
-
     height: calc(100% - 25px)
 .list-item
     transition: all 0.3s ease
@@ -114,4 +114,5 @@ export default {
         white-space: nowrap
         text-overflow: ellipsis
         overflow: hidden
+        line-height: initial
 </style>

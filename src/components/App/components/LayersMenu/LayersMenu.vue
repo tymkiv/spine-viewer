@@ -40,6 +40,7 @@ export default {
         font-size: 14px
         position: relative
         z-index: 10
+        background-color: var(--color-light)
 
     &__list-wrapper
         overflow: auto

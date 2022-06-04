@@ -256,7 +256,7 @@ export default {
 
         input:checked + .radio-label__fake-input
             &:after
-                background-color: #0062F1
+                background-color: var(--color-accent)
 
     .close-btn
         display: block
@@ -301,16 +301,16 @@ export default {
             color: blue
 
     &_color-1
-        background-color: #EAEAEC
-        border-bottom: 1px solid #F5F5F5
+        background-color: var(--color-dark)
+        border-bottom: 1px solid var(--color-light)
 
     &_color-2
-        background-color: #F5F5F5
-        border-bottom: 1px solid #EAEAEC
+        background-color: var(--color-light)
+        border-bottom: 1px solid var(--color-dark)
 
     &_drag-target
         opacity: 0.5
-        background-color: rgba(#0062F1, 0.3)
+        background-color: var(--color-accent-draggable)
     &_drop-target
         &:after
             content: ""
@@ -319,14 +319,14 @@ export default {
             border: 5px solid transparent
             pointer-events: none
         &_top:after
-            border-top-color: rgba(#0062F1, 0.5)
+            border-top-color: var(--color-accent-draggable)
 
 
         &_bottom:after
-            border-bottom-color: rgba(#0062F1, 0.5)
+            border-bottom-color: var(--color-accent-draggable)
 
         &_self:after
-            border-color: rgba(#0062F1, 0.5)
+            border-color: var(--color-accent-draggable)
 
 .list-enter-from, .list-leave-to
     opacity: 0

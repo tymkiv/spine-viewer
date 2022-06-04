@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import { REMOVE_ITEM, REMOVE_ITEM_BY_INDEXES, INSERT } from "../../utils";
+import { flat } from "../../../utils";
 
 const index = {
     _ITEMS: [
@@ -152,6 +153,11 @@ const getters = {
     },
     sceneToDisplay(state) {
         return state._SCENE_TO_DISPLAY ||= state._ITEMS[0];
+    },
+    timelineItems(state) {
+        state._SCENE_TO_DISPLAY ||= state._ITEMS[0];
+
+        return flat(state._SCENE_TO_DISPLAY?.items);
     }
 };
 

@@ -17,6 +17,7 @@
                 @scroll-left="(value) => $emit('scrollLeft', value)"
                 @remove-click="$emit('removeClick', animation)"
                 @update-time-start="value => updateTimeStart(animation, value)"
+                @update-picked-animation="value => updatePickedAnimation(animation, value)"
             />
         </li>
     </transition-group>
@@ -52,6 +53,9 @@ export default {
     methods: {
         updateTimeStart(animation, value) {
             animation.timeStart = value;
+        },
+        updatePickedAnimation(animation, value) {
+            animation.pickedAnimation = this.probableAnimations.find(probableAnimation => probableAnimation.id === value);
         }
     }
 
@@ -62,10 +66,13 @@ export default {
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
+    transform: translateY(-90px)
+    will-change: transform
 
 .list-item
     transition: all 0.3s
     height: 90px
+    overflow: hidden
 
 .add-btn
     padding: 20px 20px 40px 20px
@@ -81,4 +88,9 @@ export default {
         border: none
         font-weight: 600
         cursor: pointer
+        background-color: var(--color-light)
+        &:hover
+            background-color: var(--color-dark)
+        &:active
+            box-shadow: inset var(--shadow)
 </style>

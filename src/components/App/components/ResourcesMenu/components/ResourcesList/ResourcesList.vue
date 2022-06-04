@@ -161,7 +161,7 @@ export default {
 
     &_drag-target
         opacity: 0.5
-        background-color: rgba(#0062F1, 0.3)
+        background-color: var(--color-accent-draggable)
     &_drop-target
         &:after
             content: ""
@@ -170,14 +170,14 @@ export default {
             border: 5px solid transparent
             pointer-events: none
         &_top:after
-            border-top-color: rgba(#0062F1, 0.5)
+            border-top-color: var(--color-accent-draggable)
 
 
         &_bottom:after
-            border-bottom-color: rgba(#0062F1, 0.5)
+            border-bottom-color: var(--color-accent-draggable)
 
         &_self:after
-            border-color: rgba(#0062F1, 0.5)
+            border-color: var(--color-accent-draggable)
 
 
 .label

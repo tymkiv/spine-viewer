@@ -1,8 +1,6 @@
 <template>
     <div
         :class="{'grabbing': cursorGrabbing}"
-        @mousemove="dispatch($event)"
-        @mouseup="dispatch($event)"
         @click="dispatch($event)"
 
         @dragenter.capture.prevent="onDragenter($event)"
@@ -98,9 +96,13 @@ export default {
     },
     mounted() {
         window.addEventListener("resize", this.dispatch);
+        window.addEventListener("mousemove", this.dispatch);
+        window.addEventListener("mouseup", this.dispatch);
     },
     unmounted() {
         window.removeEventListener("resize", this.dispatch);
+        window.removeEventListener("mousemove", this.dispatch);
+        window.removeEventListener("mouseup", this.dispatch);
     },
 
 

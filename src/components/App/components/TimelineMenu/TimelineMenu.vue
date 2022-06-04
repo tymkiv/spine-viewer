@@ -62,7 +62,7 @@ export default {
 .timeline-menu
     height: 100%
     position: relative
-    background-color: #fff
+    background-color: var(--color-light)
     box-shadow: var(--shadow)
     overflow: hidden
 

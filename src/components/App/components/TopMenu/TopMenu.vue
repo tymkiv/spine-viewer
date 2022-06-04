@@ -19,19 +19,27 @@
             </label>
         </div>
 
-        <input
-            type="file"
-            multiple
-            webkitdirectory
-            directory
-            @change="onChange($event)"
-        >
+        <div class="boot-center">
+            <label class="boot-label">
+                <input
+                    type="file"
+                    multiple
+                    webkitdirectory
+                    directory
+                    @change="onChange($event)"
+                >
+                <span class="fake-btn">Load directory</span>
+            </label>
 
-        <input
-            type="file"
-            multiple
-            @change="onChange($event)"
-        >
+            <label class="boot-label">
+                <input
+                    type="file"
+                    multiple
+                    @change="onChange($event)"
+                >
+                <span class="fake-btn">Load files</span>
+            </label>
+        </div>
     </div>
 </template>
 
@@ -62,8 +70,10 @@ export default {
 .top-menu
     height: 55px
     position: relative
-    background-color: #eaeaeb
+    background-color: var(--color-dark)
     overflow: hidden
+    display: flex
+    align-items: center
 
     &__shadow
         position: absolute
@@ -73,4 +83,33 @@ export default {
         left: -2px
         box-shadow: inset var(--shadow)
         pointer-events: none
+
+.boot-center
+    display: flex
+    align-items: center
+    margin-left: auto
+.boot-label
+    display: block
+    margin-right: 10px
+    input
+        opacity: 0
+        position: absolute
+        width: 1px
+        height: 1px
+        visibility: hidden
+    .fake-btn
+        display: flex
+        align-items: center
+        height: 30px
+        padding: 0 10px
+        box-shadow: var(--shadow)
+        border-radius: 5px
+        font-size: 14px
+        font-weight: 600
+        cursor: pointer
+        background-color: var(--color-light)
+        &:hover
+            background-color: var(--color-dark)
+        &:active
+            box-shadow: inset var(--shadow)
 </style>

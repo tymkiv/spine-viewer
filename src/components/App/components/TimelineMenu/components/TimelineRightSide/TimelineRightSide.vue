@@ -100,6 +100,7 @@ export default {
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
+    //transform: translateY(-100%)
 .wrapper
     overflow: hidden
     box-shadow: var(--shadow)
@@ -114,7 +115,7 @@ export default {
     position: relative
     z-index: 10
     box-shadow: var(--shadow)
-    background-color: #F6F6F7
+    background-color: var(--color-light)
 
 .list-wrapper
     overflow: scroll
@@ -141,6 +142,7 @@ export default {
 
 .list-item
     transition: all 0.3s ease
+    overflow: hidden
     &__wrapper
         padding: 20px 5px
         box-sizing: border-box
@@ -153,6 +155,4 @@ export default {
         align-items: center
         padding: 0 10px
         font-size: 14px
-        //position: sticky
-        //top: 20px
 </style>

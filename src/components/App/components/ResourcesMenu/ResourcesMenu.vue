@@ -4,7 +4,10 @@
             <h2 class="resources-menu__title">
                 Resources
             </h2>
-            <button @click="createClick" class="resources-menu__btn">
+            <button
+                class="resources-menu__btn"
+                @click="createClick"
+            >
                 Create layer(s)
             </button>
         </div>
@@ -81,6 +84,7 @@ export default {
         padding: 0 10px
         position: relative
         z-index: 10
+        background-color: var(--color-light)
 
     &__title
         font-size: 14px
@@ -101,6 +105,11 @@ export default {
         overflow: hidden
         text-overflow: ellipsis
         white-space: nowrap
+        background-color: var(--color-light)
+        &:hover
+            background-color: var(--color-dark)
+        &:active
+            box-shadow: inset var(--shadow)
 
     &__list-wrapper
         overflow: auto

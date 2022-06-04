@@ -10,24 +10,26 @@
             <div
                 ref="plate"
                 class="plate"
+                :class="{'draggable': inDrag}"
                 @dragstart.prevent
                 @mousedown="mousedown($event)"
             >
                 <select
                     class="plate__select"
                     @mousedown.stop
+                    @change="$emit('updatePickedAnimation', $event.target.value)"
                 >
                     <option
                         v-for="probableAnimation in probableAnimations"
                         :key="probableAnimation.id"
                         :selected="probableAnimation === pickedAnimation"
-                        :value="probableAnimation.name"
+                        :value="probableAnimation.id"
                     >
                         {{ probableAnimation.name }}
                     </option>
                 </select>
 
-                <div class="plate__duration" />
+                <div class="plate__duration" :style="{width: pickedAnimation.duration * 200 + 'px'}"/>
             </div>
 
             <btn-remove @click="$emit('removeClick')" />
@@ -58,7 +60,7 @@ export default {
             required: true
         }
     },
-    emits: ["scrollLeft", "removeClick", "updateTimeStart"],
+    emits: ["scrollLeft", "removeClick", "updateTimeStart", "updatePickedAnimation"],
     data() {
         return {
             maxSpeed: 15, // максимальная скорость расширения и скролла, при перетаскивании thumb за границы
@@ -68,21 +70,33 @@ export default {
             x: 0,
             lastX: 0,
             rightBorder: 0,
-            leftBorder: 0
+            leftBorder: 0,
+            inDrag: false
         };
     },
     watch: {
         timeStart() {
-            gsap.set(this.$refs.wrapper, { x: this.timeStart / 5 });
+            this.moveByTimeStart(this.timeStart);
         }
     },
+    mounted() {
+        this.moveByTimeStart(this.timeStart);
+        const width = this.timeStart * 200 + Math.max(this.$refs.wrapper.offsetWidth, this.pickedAnimation.duration * 200 + 25);
+        gsap.set(this.$refs.track, { width: this.scroller.clientWidth > width ? "" : width });
+    },
     methods: {
+        moveByTimeStart(timeStart) {
+            gsap.set(this.$refs.wrapper, { x: timeStart * 200 });
+            this.lastX = timeStart * 200 - this.deltaX;
+        },
         mousedown(e) {
             this.startX = e.clientX;
             this.rightBorder = this.getUpdatedRightBorder();
             this.leftBorder = this.getUpdatedLeftBorder();
             this.rightBorder = Math.max(this.rightBorder, this.lastX);
             this.leftBorder = Math.min(this.leftBorder, this.lastX);
+
+            this.inDrag = true;
 
             // window.addEventListener("mousemove", this._bind.mousemove);
             // window.addEventListener("mouseup", this._bind.mouseup);
@@ -102,7 +116,7 @@ export default {
         tick() {
             this.x = this.deltaX + this.lastX;
 
-            const borderEnd = this.$refs.track.offsetWidth - this.$refs.wrapper.offsetWidth;
+            const borderEnd = this.$refs.track.offsetWidth - Math.max(this.$refs.wrapper.offsetWidth, this.pickedAnimation.duration * 200 + 25);
 
             const rightBorderMinThreshold = this.getUpdatedRightBorder();
             const leftBorderMinThreshold = this.getUpdatedLeftBorder();
@@ -116,7 +130,6 @@ export default {
                 this.rightBorder += speed;
                 this.x > borderEnd && gsap.set(this.$refs.track, { width: `+=${speed}` });
                 this.$emit("scrollLeft", this.scroller.scrollLeft + speed);
-                // this.scroller.scrollLeft += speed;
                 this.leftBorder = this.getUpdatedLeftBorder();
             }
 
@@ -139,8 +152,8 @@ export default {
             // }
 
             // gsap.set(this.$refs.wrapper, { x: this.x });
-            this.$emit("updateTimeStart", this.x * 5);
-            this.lastX = this.x - this.deltaX;
+            this.$emit("updateTimeStart", this.x / 200);
+            // this.lastX = this.x - this.deltaX;
         },
 
         mousemove(e) {
@@ -162,6 +175,7 @@ export default {
             this.lastX = this.x;
             this.deltaX = 0;
             this.x = 0;
+            this.inDrag = false;
 
             // window.removeEventListener("mousemove", this._bind.mousemove);
             // window.removeEventListener("mouseup", this._bind.mouseup);
@@ -182,7 +196,7 @@ export default {
         },
 
         getUpdatedRightBorder() {
-            return this.scroller.scrollLeft + this.scroller.offsetWidth - this.$refs.wrapper.offsetWidth;
+            return this.scroller.scrollLeft + this.scroller.clientWidth - Math.max(this.$refs.wrapper.offsetWidth, this.pickedAnimation.duration * 200 + 25);
         },
 
         getUpdatedLeftBorder() {
@@ -203,12 +217,14 @@ export default {
         align-items: center
 .plate
     border-radius: 5px
-    background-color: #E3E3E4
-    box-shadow: 0 0 2px 1px #ccc
+    background-color: var(--color-light)
+    box-shadow: var(--shadow)
     height: 30px
     padding: 0 30px 0 30px
     cursor: grab
     position: relative
+    &.draggable
+        box-shadow: 0 0 4px 1px #{rgba(#111, 0.25)}
 
 
     &:before, &:after
@@ -254,6 +270,7 @@ export default {
         left: 0
         height: 5px
         width: 0
-        background-color: #0062F1
+        background-color: var(--color-accent)
         border-radius: 5px 5px 0 0
+        transition: width 0.3s
 </style>

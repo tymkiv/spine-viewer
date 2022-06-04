@@ -16,7 +16,7 @@
 .border
     position: absolute
     inset: 10%
-    border: 2px dashed #eaeaea
+    border: 2px dashed var(--color-light)
 .text
     position: absolute
     top: 50%
@@ -24,5 +24,5 @@
     font-size: 24px
     font-weight: 600
     transform: translate(-50%, -50%)
-    color: #eaeaea
+    color: var(--color-dark)
 </style>

@@ -42,5 +42,13 @@
         &:after
             opacity: 1
 
+    &:not(.stop):active
+        &:before
+            opacity: 1
+        &:after
+            opacity: 0
+
+
+
 
 </style>
