@@ -259,6 +259,7 @@ export default {
         cursor: pointer
         text-overflow: ellipsis
         width: 100%
+        -webkit-appearance: none
 
 
     &__select:focus

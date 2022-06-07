@@ -47,7 +47,7 @@ export default {
     },
     computed: {
         items() {
-            return flat(this.$store.getters["layers/sceneToDisplay"]?.items);
+            return this.$store.getters["layers/timelineItems"];
         }
     },
     methods: {
@@ -65,6 +65,7 @@ export default {
     background-color: var(--color-light)
     box-shadow: var(--shadow)
     overflow: hidden
+    z-index: 99
 
 .split-container
     height: 100%

@@ -1,4 +1,5 @@
 <template>
+
     <div
         :class="{'grabbing': cursorGrabbing}"
         @click="dispatch($event)"
@@ -21,10 +22,12 @@
             :dbl-click-splitter="false"
             horizontal
             class="split-container"
+            @resize="$refs['scene-menu'].updateSize()"
         >
             <split-pane>
                 <split-container
                     :dbl-click-splitter="false"
+                    @resize="$refs['scene-menu'].updateSize()"
                 >
                     <split-pane
                         size="20"
@@ -34,7 +37,11 @@
                         <layers-menu />
                     </split-pane>
 
-                    <split-pane min-size="20" />
+                    <split-pane
+                        min-size="20"
+                    >
+                        <scene-menu ref="scene-menu" />
+                    </split-pane>
 
                     <split-pane
                         size="20"
@@ -58,6 +65,7 @@
 </template>
 
 <script>
+import { Sketch } from "@ckpack/vue-color";
 import "splitpanes/dist/splitpanes.css";
 import { Splitpanes as SplitContainer, Pane as SplitPane } from "splitpanes";
 import BootOverlay from "./components/BootOverlay";
@@ -66,6 +74,7 @@ import TopMenu from "./components/TopMenu";
 import LayersMenu from "./components/LayersMenu";
 import TimelineMenu from "./components/TimelineMenu";
 import ResourcesMenu from "./components/ResourcesMenu";
+import SceneMenu from "./components/SceneMenu";
 import {
     fileReader,
     itemsReader,
@@ -82,11 +91,14 @@ export default {
         TopMenu,
         LayersMenu,
         ResourcesMenu,
-        TimelineMenu
+        TimelineMenu,
+        SceneMenu,
+        Sketch
     },
     data() {
         return {
-            bootOver: false
+            bootOver: false,
+            colors: "#ffffff"
         };
     },
     computed: {
@@ -98,6 +110,8 @@ export default {
         window.addEventListener("resize", this.dispatch);
         window.addEventListener("mousemove", this.dispatch);
         window.addEventListener("mouseup", this.dispatch);
+
+        this.$store.dispatch("app/addListener", { type: "resize", callback: () => this.$refs["scene-menu"].updateSize() });
     },
     unmounted() {
         window.removeEventListener("resize", this.dispatch);
@@ -117,25 +131,25 @@ export default {
             this.bootOver = false;
         },
         onDragenter(event) {
-            if (event.dataTransfer.items.length) {
+            if (event.dataTransfer.types.length) {
                 event.stopPropagation();
                 this.showBootOver();
             }
         },
         onDragover(event) {
-            if (event.dataTransfer.items.length) {
+            if (event.dataTransfer.types.length) {
                 event.stopPropagation();
                 this.showBootOver();
             }
         },
         onDragleave(event) {
-            if (event.dataTransfer.items.length) {
+            if (event.dataTransfer.types.length) {
                 event.stopPropagation();
                 this.hideBootOver();
             }
         },
         onDrop(event) {
-            if (event.dataTransfer.items.length) {
+            if (event.dataTransfer.types.length) {
                 event.stopPropagation();
                 this.hideBootOver();
                 this.handleItems(event.dataTransfer.items);
@@ -157,6 +171,7 @@ export default {
 
             this.$store.dispatch("layers/loadItems", layersItems);
             this.$store.dispatch("resources/loadItems", resourceItems);
+            // this.$store.dispatch("layers/selectSceneToDisplay", this.$store.getters["layers/items"][])
         }
 
     }
@@ -170,13 +185,16 @@ export default {
 .boot-menu
     position: absolute
     inset: 0
-    z-index: 999
+    z-index: 9999
     pointer-events: none
 </style>
 
 <style lang="sass">
 .grabbing, .grabbing *
     cursor: grabbing!important
+
+.splitpanes--horizontal .splitpanes__pane
+    transition: none
 .splitpanes__splitter
     position: relative
 

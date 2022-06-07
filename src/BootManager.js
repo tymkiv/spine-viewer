@@ -1,6 +1,8 @@
 import * as PIXI from "pixi.js";
-import "pixi-spine";
+// import "pixi-spine";
+import "pixi-spine_v3.8";
 import { v4 } from "uuid";
+import Spine from "./Spine";
 
 function createSpineData(json, atlas, png) {
     const rawSkeletonData = JSON.parse(json.result.data);
@@ -9,10 +11,11 @@ function createSpineData(json, atlas, png) {
         const img = new Image();
         img.src = png.find(data => data.name === line).result.data;
         PIXI.utils.BaseTextureCache[line] = new PIXI.BaseTexture(img); // Добавляем картинку в хеш
+        PIXI.utils.BaseTextureCache[line].mipmap = false;
         callback(PIXI.BaseTexture.fromImage(line));
     });
-
     const spineAtlasLoader = new PIXI.spine.core.AtlasAttachmentLoader(spineAtlas);
+    // console.log(spineAtlasLoader);
     const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
 
     return spineJsonParser.readSkeletonData(rawSkeletonData);

@@ -64,7 +64,11 @@ export const flat = (items) => {
     if (items) {
         for (let i = 0; i < items.length; i++) {
             if (items[i].spine) {
-                result.push({ ...items[i], items: [] }, ...flat(items[i].items));
+                const children = flat(items[i].items);
+                children.forEach(child => {
+                    child.childFor = items[i];
+                });
+                result.push({ ...items[i], items: [] }, ...children);
             }
         }
     }

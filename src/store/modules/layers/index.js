@@ -4,140 +4,140 @@ import { flat } from "../../../utils";
 
 const index = {
     _ITEMS: [
-        {
-            id: v4(),
-            name: "Scene 1",
-            type: "scene",
-            items: [
-                {
-                    id: v4(),
-                    name: "Spine 1",
-                    type: "item",
-                    items: [],
-                    probableAnimations: [
-                        {
-                            id: v4(),
-                            name: "animation 1",
-                            duration: 0.5
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 2",
-                            duration: 0.7
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 3",
-                            duration: 0.3
-                        }
-                    ],
-                    animations: []
-                },
-                {
-                    id: v4(),
-                    name: "Spine 2",
-                    type: "item",
-                    items: [],
-                    probableAnimations: [
-                        {
-                            id: v4(),
-                            name: "animation 1",
-                            duration: 0.5
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 2",
-                            duration: 0.7
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 3",
-                            duration: 0.3
-                        }
-                    ],
-                    animations: []
-                },
-                {
-                    id: v4(),
-                    name: "Spine 3",
-                    type: "item",
-                    items: [],
-                    probableAnimations: [
-                        {
-                            id: v4(),
-                            name: "animation 1",
-                            duration: 0.5
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 2",
-                            duration: 0.7
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 3",
-                            duration: 0.3
-                        }
-                    ],
-                    animations: []
-                },
-                {
-                    id: v4(),
-                    name: "Spine 4",
-                    type: "item",
-                    items: [],
-                    probableAnimations: [
-                        {
-                            id: v4(),
-                            name: "animation 1",
-                            duration: 0.5
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 2",
-                            duration: 0.7
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 3",
-                            duration: 0.3
-                        }
-                    ],
-                    animations: []
-                }
-            ]
-        },
-        {
-            id: v4(),
-            name: "Scene 2",
-            type: "scene",
-            items: [
-                {
-                    id: v4(),
-                    name: "Spine 5",
-                    type: "item",
-                    items: [],
-                    probableAnimations: [
-                        {
-                            id: v4(),
-                            name: "animation 1",
-                            duration: 0.5
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 2",
-                            duration: 0.7
-                        },
-                        {
-                            id: v4(),
-                            name: "animation 3",
-                            duration: 0.3
-                        }
-                    ],
-                    animations: []
-                }
-            ]
-        }
+        // {
+        //     id: v4(),
+        //     name: "Scene 1",
+        //     type: "scene",
+        //     items: [
+        //         {
+        //             id: v4(),
+        //             name: "Spine 1",
+        //             type: "item",
+        //             items: [],
+        //             probableAnimations: [
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 1",
+        //                     duration: 0.5
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 2",
+        //                     duration: 0.7
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 3",
+        //                     duration: 0.3
+        //                 }
+        //             ],
+        //             animations: []
+        //         },
+        //         {
+        //             id: v4(),
+        //             name: "Spine 2",
+        //             type: "item",
+        //             items: [],
+        //             probableAnimations: [
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 1",
+        //                     duration: 0.5
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 2",
+        //                     duration: 0.7
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 3",
+        //                     duration: 0.3
+        //                 }
+        //             ],
+        //             animations: []
+        //         },
+        //         {
+        //             id: v4(),
+        //             name: "Spine 3",
+        //             type: "item",
+        //             items: [],
+        //             probableAnimations: [
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 1",
+        //                     duration: 0.5
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 2",
+        //                     duration: 0.7
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 3",
+        //                     duration: 0.3
+        //                 }
+        //             ],
+        //             animations: []
+        //         },
+        //         {
+        //             id: v4(),
+        //             name: "Spine 4",
+        //             type: "item",
+        //             items: [],
+        //             probableAnimations: [
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 1",
+        //                     duration: 0.5
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 2",
+        //                     duration: 0.7
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 3",
+        //                     duration: 0.3
+        //                 }
+        //             ],
+        //             animations: []
+        //         }
+        //     ]
+        // },
+        // {
+        //     id: v4(),
+        //     name: "Scene 2",
+        //     type: "scene",
+        //     items: [
+        //         {
+        //             id: v4(),
+        //             name: "Spine 5",
+        //             type: "item",
+        //             items: [],
+        //             probableAnimations: [
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 1",
+        //                     duration: 0.5
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 2",
+        //                     duration: 0.7
+        //                 },
+        //                 {
+        //                     id: v4(),
+        //                     name: "animation 3",
+        //                     duration: 0.3
+        //                 }
+        //             ],
+        //             animations: []
+        //         }
+        //     ]
+        // }
     ],
 
     _ITEM_TO_REDACT: null,
@@ -249,8 +249,9 @@ const actions = {
         commit("_REMOVE_ANIMATION_FROM_ITEM", { item, animation });
     },
 
-    loadItems({ commit }, items) {
+    loadItems({ commit, state }, items) {
         commit("_LOAD_ITEMS", items);
+        commit("_SELECT_SCENE_TO_DISPLAY", state._ITEMS[state._ITEMS.length - 1]);
     }
 };
 

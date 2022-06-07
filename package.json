@@ -28,15 +28,16 @@
     "url": "^0.11.0"
   },
   "dependencies": {
+    "@ckpack/vue-color": "^1.1.9",
     "gsap": "^3.10.4",
     "lodash": "^4.17.21",
     "pixi-spine": "^1.6.2",
+    "pixi-spine_v3.8": "git+https://github.com/pixijs/pixi-spine.git#pixi4-spine3.8",
     "pixi.js": "4.8.8",
     "reset-css": "^5.0.1",
     "splitpanes": "^3.1.1",
     "uuid": "^8.3.2",
     "vue": "^3.2.30",
-    "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2"
   },
   "browserslist": "> 0.5%, last 2 versions, not dead",

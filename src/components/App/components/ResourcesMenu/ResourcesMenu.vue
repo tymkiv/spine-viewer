@@ -74,6 +74,8 @@ export default {
     overflow: hidden
     box-shadow: var(--shadow)
 
+    position: relative
+    z-index: 10
 
     &__header
         height: 55px

@@ -24,6 +24,8 @@ export default {
     height: 100%
     width: 100%
 
+    position: relative
+    z-index: 10
     box-shadow: var(--shadow)
 
     &__wrapper

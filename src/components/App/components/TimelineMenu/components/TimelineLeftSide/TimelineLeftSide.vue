@@ -70,7 +70,7 @@ export default {
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
-    transform: translateY(-100%)
+    //transform: translateY(-100%)
 .wrapper
     overflow: hidden
     box-shadow: var(--shadow)

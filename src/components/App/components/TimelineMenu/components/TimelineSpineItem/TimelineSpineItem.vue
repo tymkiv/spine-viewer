@@ -53,9 +53,11 @@ export default {
     methods: {
         updateTimeStart(animation, value) {
             animation.timeStart = value;
+            this.$store.getters["app/listeners"].restart?.forEach(cb => cb());
         },
         updatePickedAnimation(animation, value) {
             animation.pickedAnimation = this.probableAnimations.find(probableAnimation => probableAnimation.id === value);
+            this.$store.getters["app/listeners"].restart?.forEach(cb => cb());
         }
     }
 

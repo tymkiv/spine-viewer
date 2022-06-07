@@ -1,6 +1,10 @@
 const index = {
     _LISTENERS: [],
-    _CURSOR_GRABBING: false
+    _CURSOR_GRABBING: false,
+    _TIME_CURSOR: 0,
+    _LOOP: true,
+    _SPEED: 1,
+    _PLAY: false
 };
 
 const getters = {
@@ -10,6 +14,22 @@ const getters = {
 
     cursorGrabbing(state) {
         return state._CURSOR_GRABBING;
+    },
+
+    timeCursor(state) {
+        return state._TIME_CURSOR;
+    },
+
+    loop(state) {
+        return state._LOOP;
+    },
+
+    speed(state) {
+        return state._SPEED;
+    },
+
+    play(state) {
+        return state._PLAY;
     }
 };
 
@@ -26,6 +46,23 @@ const mutations = {
 
     _SET_CURSOR_GRABBING(state, value) {
         state._CURSOR_GRABBING = value;
+    },
+
+    _SET_TIME_CURSOR(state, value) {
+        state._TIME_CURSOR = value;
+    },
+
+    _SET_LOOP(state, value) {
+        state._LOOP = value;
+    },
+
+    _SET_SPEED(state, value) {
+        state._SPEED = value;
+    },
+
+    _SET_PLAY(state, value) {
+        console.log("play = ", value );
+        state._PLAY = value;
     }
 };
 
@@ -44,6 +81,22 @@ const actions = {
 
     setCursorGrabbing({ commit }, value) {
         commit("_SET_CURSOR_GRABBING", value);
+    },
+
+    setTimeCursor({ commit }, value) {
+        commit("_SET_TIME_CURSOR", value);
+    },
+
+    setLoop({ commit }, value) {
+        commit("_SET_LOOP", value);
+    },
+
+    setSpeed({ commit }, value) {
+        commit("_SET_SPEED", value);
+    },
+
+    setPlay({ commit }, value) {
+        commit("_SET_PLAY", value);
     }
 };
 

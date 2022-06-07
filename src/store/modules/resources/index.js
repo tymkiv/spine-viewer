@@ -3,30 +3,30 @@ import { REMOVE_ITEM, REMOVE_ITEM_BY_INDEXES, INSERT } from "../../utils";
 
 const index = {
     _ITEMS: [
-        {
-            id: v4(),
-            type: "item",
-            name: "resource 1",
-            checked: false
-        },
-        {
-            id: v4(),
-            type: "item",
-            name: "resource 2",
-            checked: false
-        },
-        {
-            id: v4(),
-            type: "item",
-            name: "resource 3",
-            checked: false
-        },
-        {
-            id: v4(),
-            type: "item",
-            name: "resource 4",
-            checked: false
-        }
+        // {
+        //     id: v4(),
+        //     type: "item",
+        //     name: "resource 1",
+        //     checked: false
+        // },
+        // {
+        //     id: v4(),
+        //     type: "item",
+        //     name: "resource 2",
+        //     checked: false
+        // },
+        // {
+        //     id: v4(),
+        //     type: "item",
+        //     name: "resource 3",
+        //     checked: false
+        // },
+        // {
+        //     id: v4(),
+        //     type: "item",
+        //     name: "resource 4",
+        //     checked: false
+        // }
     ]
 };
 
