@@ -61,7 +61,6 @@ const mutations = {
     },
 
     _SET_PLAY(state, value) {
-        console.log("play = ", value );
         state._PLAY = value;
     }
 };
