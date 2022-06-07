@@ -18,10 +18,21 @@
             </button>
 
             <label class="label">
+                <span class="name"> Loop </span>
                 <input class="checkbox" type="checkbox" :checked="$store.getters['app/loop']" @change="$store.dispatch('app/setLoop', $event.target.checked)">
                 <span class="fake-checkbox" />
-                <span class="name"> Loop </span>
             </label>
+
+            <div class="speed">
+                <span class="speed-title">Speed</span>
+                <div ref="speed-range" class="speed-range">
+                    <div
+                        ref="speed-cursor"
+                        class="speed-cursor"
+                        @mousedown.prevent="mouseDown"
+                    ></div>
+                </div>
+            </div>
 
 
         </div>
@@ -66,12 +77,21 @@
 </template>
 
 <script>
+import gsap from "gsap";
 export default {
     emits: ["on-load-items"],
 
     computed: {
         itemToRedact() {
             return this.$store.getters["layers/itemToRedact"];
+        },
+        speed() {
+            return this.$store.getters["app/speed"];
+        }
+    },
+    watch: {
+        speed() {
+            gsap.set(this.$refs["speed-cursor"], { x: this.speed * this.$refs["speed-range"].offsetWidth });
         }
     },
 
@@ -83,12 +103,58 @@ export default {
             this.$emit("on-load-items", event.target.files);
             event.target.files = null;
             event.target.value = "";
+        },
+        mouseDown() {
+            this.$store.dispatch("app/addListener", { type: "mousemove", callback: this.mouseMove });
+            this.$store.dispatch("app/addListener", { type: "mouseup", callback: this.mouseUp });
+            this.$store.dispatch("app/setCursorGrabbing", true);
+        },
+        mouseUp() {
+            this.$store.dispatch("app/removeListener", { type: "mousemove", callback: this.mouseMove });
+            this.$store.dispatch("app/removeListener", { type: "mouseup", callback: this.mouseUp });
+            this.$store.dispatch("app/setCursorGrabbing", false);
+        },
+        mouseMove(event) {
+            const clientX = event.clientX;
+
+            const { left, right } = this.$refs["speed-range"].getBoundingClientRect();
+            const speed = Math.max(0, Math.min(1, (clientX - left) / (right - left)));
+            this.$store.dispatch("app/setSpeed", speed);
         }
     }
 };
 </script>
 
 <style scoped lang="sass">
+.speed
+    display: flex
+    align-items: center
+    .speed-title
+        font-size: 14px
+        font-weight: 600
+
+        margin-right: 10px
+.speed-range
+    width: 150px
+    height: 25px
+    position: relative
+    &:before
+        content: ""
+        position: absolute
+        left: 0
+        top: 10px
+        bottom: 10px
+        width: 100%
+        background-color: var(--color-light)
+        border-radius: 5px
+    .speed-cursor
+        position: absolute
+        top: 0
+        width: 5px
+        height: 25px
+        border-radius: 5px
+        background-color: var(--color-accent)
+        cursor: grab
 .top-menu
     height: 55px
     position: relative
@@ -171,7 +237,7 @@ export default {
     display: flex
     align-items: center
     box-sizing: border-box
-    width: 100%
+    //width: 100%
     cursor: pointer
 
 .checkbox
@@ -208,7 +274,8 @@ export default {
 .name
     font-size: 14px
     display: block
-    margin-right: auto
+    margin-right: 10px
+    //margin-right: auto
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
