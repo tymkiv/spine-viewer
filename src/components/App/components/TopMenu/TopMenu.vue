@@ -25,11 +25,11 @@
 
             <div class="speed">
                 <span class="speed-title">Speed</span>
-                <div ref="speed-range" class="speed-range">
+                <div ref="speed-range" class="speed-range" @mousedown.prevent="mouseDown($event)">
                     <div
                         ref="speed-cursor"
                         class="speed-cursor"
-                        @mousedown.prevent="mouseDown"
+
                     ></div>
                 </div>
             </div>
@@ -91,8 +91,12 @@ export default {
     },
     watch: {
         speed() {
-            gsap.set(this.$refs["speed-cursor"], { x: this.speed * this.$refs["speed-range"].offsetWidth });
+            this.setSpeedCursor();
         }
+    },
+
+    mounted() {
+        this.setSpeedCursor();
     },
 
     methods: {
@@ -104,10 +108,12 @@ export default {
             event.target.files = null;
             event.target.value = "";
         },
-        mouseDown() {
+        mouseDown(event) {
             this.$store.dispatch("app/addListener", { type: "mousemove", callback: this.mouseMove });
             this.$store.dispatch("app/addListener", { type: "mouseup", callback: this.mouseUp });
             this.$store.dispatch("app/setCursorGrabbing", true);
+
+            this.mouseMove(event);
         },
         mouseUp() {
             this.$store.dispatch("app/removeListener", { type: "mousemove", callback: this.mouseMove });
@@ -120,6 +126,9 @@ export default {
             const { left, right } = this.$refs["speed-range"].getBoundingClientRect();
             const speed = Math.max(0, Math.min(1, (clientX - left) / (right - left)));
             this.$store.dispatch("app/setSpeed", speed);
+        },
+        setSpeedCursor() {
+            gsap.set(this.$refs["speed-cursor"], { x: this.speed * this.$refs["speed-range"].offsetWidth });
         }
     }
 };
@@ -138,6 +147,7 @@ export default {
     width: 150px
     height: 25px
     position: relative
+    cursor: grab
     &:before
         content: ""
         position: absolute
@@ -154,7 +164,6 @@ export default {
         height: 25px
         border-radius: 5px
         background-color: var(--color-accent)
-        cursor: grab
 .top-menu
     height: 55px
     position: relative
