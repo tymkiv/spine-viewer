@@ -5,14 +5,16 @@
         <div class="manage-center">
             <button
                 class="btn btn_accent"
+                :disabled="!$store.getters['layers/timelineItems'].length"
                 @click="$store.dispatch('app/setPlay', !$store.getters['app/play'])"
             >
-                <template v-if="!$store.getters['app/play']">Play</template>
+                <template v-if="!$store.getters['app/play'] || !$store.getters['layers/timelineItems'].length ">Play</template>
                 <template v-else>Pause</template>
             </button>
             <button
                 class="btn"
-                @click="$store.getters['app/listeners'].restart?.forEach(cb => cb())"
+                :disabled="!$store.getters['layers/timelineItems'].length"
+                @click="() => {$store.getters['app/listeners'].restart?.forEach(cb => cb()); $store.dispatch('app/setPlay', true)}"
             >
                 Restart
             </button>
@@ -96,6 +98,8 @@ export default {
     },
 
     mounted() {
+        console.log(this.$store.getters["layers/timelineItems"]);
+        console.log(!!this.$store.getters['layers/timelineItems'].length);
         this.setSpeedCursor();
     },
 
