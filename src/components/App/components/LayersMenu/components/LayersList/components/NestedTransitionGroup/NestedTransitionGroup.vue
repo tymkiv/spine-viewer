@@ -147,7 +147,8 @@ export default {
                     "list-item_drop-target_top": this.dropTarget === item && this.dropTargetPlace === "top",
                     "list-item_drop-target_bottom": this.dropTarget === item && this.dropTargetPlace === "bottom",
                     "list-item_drop-target_self": this.dropTarget === item && this.dropTargetPlace === "self",
-                    "list-item_disable-animation": this.nestedLevel > this.animationLevel
+                    "list-item_disable-animation": this.nestedLevel > this.animationLevel,
+                    "scene_selected": this.$store.getters["layers/sceneToDisplay"] === item
                 }
             ]);
         }
@@ -177,15 +178,33 @@ export default {
         },
 
         onItemSelect(item) {
-            this.$store.dispatch("layers/selectItemToRedact", item);
-            // this.$store.commit("selectToRedact", { item: item });
-            this.$store.dispatch("app/addListener", {
-                type: "click",
-                callback: () => this.$store.dispatch("layers/unselectItemToRedact"),
-                // callback: () => this.$store.commit("unselectToRedact"),
-                once: true
-            });
-            // this.$store.commit("addAppClickListener", { callback: () => this.$store.commit("unselectToRedact"), once: true });
+            console.log(item.type);
+
+            if (item.type === "scene") {
+                this.$store.dispatch("layers/selectSceneToDisplay", item);
+            } else {
+                this.$store.dispatch("layers/selectItemToRedact", item);
+                this.$store.dispatch("app/addListener", {
+                    type: "click",
+                    callback: () => this.$store.dispatch("layers/unselectItemToRedact"),
+                    once: true
+                });
+
+                const cb = e => {
+                    if (e.code === "Escape" || e.code === "Enter") {
+                        this.$store.dispatch("layers/unselectItemToRedact");
+                        this.$store.dispatch("app/removeListener", { type: "keydown", callback: cb });
+                    }
+                };
+
+                this.$store.dispatch("app/addListener", {
+                    type: "keydown",
+                    callback: cb
+                });
+            }
+
+
+
         }
     }
 };
@@ -199,6 +218,9 @@ export default {
     box-sizing: border-box
     overflow: hidden
     cursor: pointer
+
+    &.scene_selected
+        background-color: var(--color-accent-selected)
 
     .item-header
         height: 40px

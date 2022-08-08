@@ -141,7 +141,7 @@ export async function fileReader(rawFiles) {
 }
 
 export function prepareItemsForLayersMenu(files) {
-    const sceneName = files.subFolder ? files.name : "Scene";
+    const sceneName = files.subFolder ? files.name : null;
     files = files.subFolder ? files.subFolder : files;
 
     const jsonFiles = files.filter(file => file.extension === "json");
@@ -237,7 +237,7 @@ export function prepareItemsForLayersMenu(files) {
     if (layers.length) {
         items.push({
             type: "scene",
-            name: sceneName,
+            name: sceneName || layers[0].name,
             id: v4(),
             items: layers
         });

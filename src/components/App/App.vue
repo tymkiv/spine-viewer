@@ -110,6 +110,7 @@ export default {
         window.addEventListener("resize", this.dispatch);
         window.addEventListener("mousemove", this.dispatch);
         window.addEventListener("mouseup", this.dispatch);
+        window.addEventListener("keydown", this.dispatch);
 
         this.$store.dispatch("app/addListener", { type: "resize", callback: () => this.$refs["scene-menu"].updateSize() });
     },
@@ -117,6 +118,7 @@ export default {
         window.removeEventListener("resize", this.dispatch);
         window.removeEventListener("mousemove", this.dispatch);
         window.removeEventListener("mouseup", this.dispatch);
+        window.removeEventListener("keydown", this.dispatch);
     },
 
 

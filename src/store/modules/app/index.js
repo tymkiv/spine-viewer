@@ -68,7 +68,7 @@ const mutations = {
 const actions = {
     addListener({ commit }, { type, callback, once }) {
         const coveredCallback = once
-            ? () => { callback(); commit("_REMOVE_LISTENER", { type, callback: coveredCallback }); }
+            ? (e) => { callback(e); commit("_REMOVE_LISTENER", { type, callback: coveredCallback }); }
             : callback;
 
         commit("_ADD_LISTENER", { type, callback: coveredCallback });

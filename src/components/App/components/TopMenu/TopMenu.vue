@@ -46,10 +46,10 @@
             >
                 Name:
                 <input
+                    ref="redact-name"
                     type="text"
                     :value="itemToRedact.name"
                     @input="redactItem($event.target.value)"
-                    @keydown.enter="$event.target.blur()"
                 >
             </label>
         </div>
@@ -94,6 +94,14 @@ export default {
     watch: {
         speed() {
             this.setSpeedCursor();
+        },
+        itemToRedact() {
+            if (this.itemToRedact) {
+                this.$nextTick(() => {
+                    this.$refs["redact-name"].focus();
+                });
+
+            }
         }
     },
 

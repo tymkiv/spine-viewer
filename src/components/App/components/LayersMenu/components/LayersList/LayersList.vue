@@ -238,7 +238,7 @@ export default {
         createNewScene(items) {
             return {
                 id: v4(),
-                name: "Scene name 11111",
+                name: items[0].name,
                 type: "scene",
                 items
             };
