@@ -15,7 +15,13 @@
             @click="colorPickerOpen = !colorPickerOpen"
         ></div>
         <canvas ref="scene" @wheel="onWheel($event)"></canvas>
-        <div class="scale-prompt">{{ `${Math.round((1 / scale) * 100)}%` }}</div>
+        <div class="scale-prompt">
+            <button class="scale-prompt__btn" @click="$store.dispatch('app/setScale', Math.min(Math.max(1 / Number((1 / scale - 0.1).toFixed(1)), 0.25), 4))"> - </button>
+            <div class="scale-prompt__info">
+                {{ `${Math.round((1 / scale) * 100)}%` }}
+            </div>
+            <button class="scale-prompt__btn" @click="$store.dispatch('app/setScale', Math.min(Math.max(1 / Number((1 / scale + 0.1).toFixed(1)), 0.25), 4))" > + </button>
+        </div>
     </div>
 </template>
 
@@ -95,6 +101,7 @@ export default {
             this.timeline?.timeScale(this.speed);
         },
         scale() {
+            console.log(this.scale);
             this.updateSize();
         }
     },
@@ -181,10 +188,19 @@ export default {
     position: absolute
     bottom: 20px
     right: 20px
-    background-color: #fff
-    color: #000
-    font-size: 14px
-    padding: 5px
+    display: flex
+
+    &__info
+        background-color: #fff
+        color: #000
+        font-size: 14px
+        padding: 5px
+
+    &__btn
+        background-color: #fff
+        box-shadow: none
+        border: 1px solid #ccc
+        margin: 0 5px
 
 .scene-container
     position: relative
