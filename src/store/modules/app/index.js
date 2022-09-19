@@ -4,7 +4,8 @@ const index = {
     _TIME_CURSOR: 0,
     _LOOP: true,
     _SPEED: 1,
-    _PLAY: false
+    _PLAY: false,
+    _SCALE: 1
 };
 
 const getters = {
@@ -30,6 +31,10 @@ const getters = {
 
     play(state) {
         return state._PLAY;
+    },
+
+    scale(state) {
+        return state._SCALE;
     }
 };
 
@@ -62,6 +67,10 @@ const mutations = {
 
     _SET_PLAY(state, value) {
         state._PLAY = value;
+    },
+
+    _SET_SCALE(state, value) {
+        state._SCALE = value;
     }
 };
 
@@ -96,6 +105,10 @@ const actions = {
 
     setPlay({ commit }, value) {
         commit("_SET_PLAY", value);
+    },
+
+    setScale({ commit }, value) {
+        commit("_SET_SCALE", value);
     }
 };
 

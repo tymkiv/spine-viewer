@@ -14,7 +14,8 @@
             :class="{'open': colorPickerOpen}"
             @click="colorPickerOpen = !colorPickerOpen"
         ></div>
-        <canvas ref="scene"></canvas>
+        <canvas ref="scene" @wheel="onWheel($event)"></canvas>
+        <div class="scale-prompt">{{ `${Math.round((1 / scale) * 100)}%` }}</div>
     </div>
 </template>
 
@@ -51,6 +52,9 @@ export default {
         },
         loop() {
             return this.$store.getters["app/loop"];
+        },
+        scale() {
+            return this.$store.getters["app/scale"];
         }
     },
     watch: {
@@ -89,15 +93,17 @@ export default {
         },
         speed() {
             this.timeline?.timeScale(this.speed);
+        },
+        scale() {
+            this.updateSize();
         }
     },
     mounted() {
-        window.t = this;
         this.app = new PIXI.Application({
             view: this.$refs.scene,
             resolution: 1,
             // antialias: true,
-            backgroundColor: 0xcccccc,
+            backgroundColor: 0xcccccc
         });
         this.app.stage.addChild(this.container);
         this.app.ticker.stop();
@@ -112,9 +118,15 @@ export default {
         this.$nextTick(this.updateSize);
     },
     methods: {
+        onWheel(event) {
+            const scale = Math.min(Math.max(this.scale + event.deltaY / 100, 0.25), 4);
+            this.$store.dispatch("app/setScale", scale);
+
+        },
         updateSize() {
-            this.app.renderer.resize(this.$refs.container.offsetWidth, this.$refs.container.offsetHeight);
-            this.container.position.set(this.$refs.container.offsetWidth / 2, this.$refs.container.offsetHeight / 2);
+            this.app.renderer.resize(this.$refs.container.offsetWidth * this.scale, this.$refs.container.offsetHeight * this.scale);
+            this.container.position.set(this.$refs.container.offsetWidth * this.scale / 2, this.$refs.container.offsetHeight * this.scale / 2);
+            // this.container.position.set(this.$refs.container.offsetWidth / 2, this.$refs.container.offsetHeight / 2);
         },
         setAndPlayAnimation(items) {
             this.timeline?.kill();
@@ -165,6 +177,15 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.scale-prompt
+    position: absolute
+    bottom: 20px
+    right: 20px
+    background-color: #fff
+    color: #000
+    font-size: 14px
+    padding: 5px
+
 .scene-container
     position: relative
     width: 100%
@@ -174,6 +195,8 @@ export default {
         position: absolute
         top: 0
         left: 0
+        width: 100%
+        height: 100%
 
 .color-picker
     position: absolute

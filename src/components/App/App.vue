@@ -43,13 +43,13 @@
                         <scene-menu ref="scene-menu" />
                     </split-pane>
 
-                    <split-pane
-                        size="20"
-                        max-size="40"
-                        min-size="5"
-                    >
-                        <resources-menu />
-                    </split-pane>
+<!--                    <split-pane-->
+<!--                        size="5"-->
+<!--                        max-size="40"-->
+<!--                        min-size="5"-->
+<!--                    >-->
+<!--                        <resources-menu />-->
+<!--                    </split-pane>-->
                 </split-container>
             </split-pane>
 
@@ -175,7 +175,6 @@ export default {
             this.$store.dispatch("resources/loadItems", resourceItems);
             // this.$store.dispatch("layers/selectSceneToDisplay", this.$store.getters["layers/items"][])
         }
-
     }
 };
 </script>
