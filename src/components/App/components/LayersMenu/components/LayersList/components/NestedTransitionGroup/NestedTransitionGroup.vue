@@ -178,29 +178,28 @@ export default {
         },
 
         onItemSelect(item) {
-            console.log(item.type);
 
             if (item.type === "scene") {
                 this.$store.dispatch("layers/selectSceneToDisplay", item);
             } else {
                 this.$store.dispatch("layers/selectItemToRedact", item);
-                this.$store.dispatch("app/addListener", {
-                    type: "click",
-                    callback: () => this.$store.dispatch("layers/unselectItemToRedact"),
-                    once: true
-                });
-
-                const cb = e => {
-                    if (e.code === "Escape" || e.code === "Enter") {
-                        this.$store.dispatch("layers/unselectItemToRedact");
-                        this.$store.dispatch("app/removeListener", { type: "keydown", callback: cb });
-                    }
-                };
-
-                this.$store.dispatch("app/addListener", {
-                    type: "keydown",
-                    callback: cb
-                });
+                // this.$store.dispatch("app/addListener", {
+                //     type: "click",
+                //     callback: () => this.$store.dispatch("layers/unselectItemToRedact"),
+                //     once: true
+                // });
+                //
+                // const cb = e => {
+                //     if (e.code === "Escape" || e.code === "Enter") {
+                //         this.$store.dispatch("layers/unselectItemToRedact");
+                //         this.$store.dispatch("app/removeListener", { type: "keydown", callback: cb });
+                //     }
+                // };
+                //
+                // this.$store.dispatch("app/addListener", {
+                //     type: "keydown",
+                //     callback: cb
+                // });
             }
 
 

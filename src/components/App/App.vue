@@ -31,7 +31,7 @@
                 >
                     <split-pane
                         size="20"
-                        max-size="40"
+                        max-size="50"
                         min-size="5"
                     >
                         <layers-menu />
@@ -39,17 +39,20 @@
 
                     <split-pane
                         min-size="20"
+                        size="50"
                     >
                         <scene-menu ref="scene-menu" />
                     </split-pane>
 
-<!--                    <split-pane-->
-<!--                        size="5"-->
-<!--                        max-size="40"-->
-<!--                        min-size="5"-->
-<!--                    >-->
-<!--                        <resources-menu />-->
-<!--                    </split-pane>-->
+                    <split-pane
+                        size="20"
+                        max-size="50"
+                        min-size="5"
+
+                    >
+
+                        <redact-center />
+                    </split-pane>
                 </split-container>
             </split-pane>
 
@@ -75,6 +78,7 @@ import LayersMenu from "./components/LayersMenu";
 import TimelineMenu from "./components/TimelineMenu";
 import ResourcesMenu from "./components/ResourcesMenu";
 import SceneMenu from "./components/SceneMenu";
+import RedactCenter from "./components/RedactCenter";
 import {
     fileReader,
     itemsReader,
@@ -93,12 +97,14 @@ export default {
         ResourcesMenu,
         TimelineMenu,
         SceneMenu,
-        Sketch
+        Sketch,
+        RedactCenter
     },
     data() {
         return {
             bootOver: false,
-            colors: "#ffffff"
+            colors: "#ffffff",
+            redactCenterVisible: true
         };
     },
     computed: {

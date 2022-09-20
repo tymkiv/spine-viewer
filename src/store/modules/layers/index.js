@@ -205,6 +205,10 @@ const mutations = {
 
     _LOAD_ITEMS(state, items) {
         state._ITEMS.push(...items);
+    },
+
+    _CHANGE_PLACEHOLDER(state, { item, placeholder }) {
+        item.placeholder_name = placeholder;
     }
 };
 
@@ -252,6 +256,10 @@ const actions = {
     loadItems({ commit, state }, items) {
         commit("_LOAD_ITEMS", items);
         commit("_SELECT_SCENE_TO_DISPLAY", state._ITEMS[state._ITEMS.length - 1]);
+    },
+
+    changePlaceholder({ commit, state }, { item, placeholder }) {
+        commit("_CHANGE_PLACEHOLDER", { item, placeholder });
     }
 };
 

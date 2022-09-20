@@ -39,20 +39,20 @@
 
         </div>
 
-        <div class="redact-center">
-            <label
-                v-if="itemToRedact"
-                @click.stop
-            >
-                Name:
-                <input
-                    ref="redact-name"
-                    type="text"
-                    :value="itemToRedact.name"
-                    @input="redactItem($event.target.value)"
-                >
-            </label>
-        </div>
+<!--        <div class="redact-center">-->
+<!--            <label-->
+<!--                v-if="itemToRedact"-->
+<!--                @click.stop-->
+<!--            >-->
+<!--                Name:-->
+<!--                <input-->
+<!--                    ref="redact-name"-->
+<!--                    type="text"-->
+<!--                    :value="itemToRedact.name"-->
+<!--                    @input="redactItem($event.target.value)"-->
+<!--                >-->
+<!--            </label>-->
+<!--        </div>-->
 
         <div class="boot-center">
             <label class="boot-label">
@@ -98,7 +98,7 @@ export default {
         itemToRedact() {
             if (this.itemToRedact) {
                 this.$nextTick(() => {
-                    this.$refs["redact-name"].focus();
+                    // this.$refs["redact-name"].focus();
                 });
 
             }
@@ -106,8 +106,6 @@ export default {
     },
 
     mounted() {
-        console.log(this.$store.getters["layers/timelineItems"]);
-        console.log(!!this.$store.getters['layers/timelineItems'].length);
         this.setSpeedCursor();
     },
 

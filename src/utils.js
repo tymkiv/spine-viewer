@@ -58,20 +58,45 @@ export const findIndexes = (items, item) => {
     return null;
 };
 
-export const flat = (items) => {
+export const flat = (items, parent) => {
     const result = [];
 
     if (items) {
         for (let i = 0; i < items.length; i++) {
             if (items[i].spine) {
-                const children = flat(items[i].items);
-                children.forEach(child => {
-                    child.childFor = items[i];
-                });
-                result.push({ ...items[i], items: [] }, ...children);
+                const newObj = { ...items[i], items: [] };
+                if (parent) {
+                    newObj.childFor = parent;
+                }
+                const children = flat(items[i].items, items[i]);
+                // children.forEach(child => {
+                //     child.childFor = items[i];
+                // });
+
+
+
+                result.push(newObj, ...children);
             }
         }
     }
 
     return result;
 };
+
+// export const flat = (items) => {
+//     const result = [];
+//
+//     if (items) {
+//         for (let i = 0; i < items.length; i++) {
+//             if (items[i].spine) {
+//                 const children = flat(items[i].items);
+//                 children.forEach(child => {
+//                     child.childFor = items[i];
+//                 });
+//                 result.push({ ...items[i], items: [] }, ...children);
+//             }
+//         }
+//     }
+//
+//     return result;
+// };

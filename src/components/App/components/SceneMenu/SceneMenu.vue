@@ -91,9 +91,27 @@ export default {
             const reversedItems = [...newItems].reverse();
             reversedItems.forEach(item => {
             // newItems.forEach(item => {
-                this.container.addChild(item.spine);
-            });
 
+                if (item.childFor) {
+                    if (!item.placeholder_name) return;
+
+                    const slotIndex = item.childFor.spine.skeleton.findSlotIndex(item.placeholder_name);
+                    const slot = item.childFor.spine.skeleton.slots[slotIndex];
+
+                    if (slot?.currentSprite) {
+                        slot.currentSprite.texture = void (0);
+                        // removeChildren && slot.currentSprite.removeChildren();
+                        slot.currentSprite.addChild(item.spine);
+                    } else {
+                        console.log("Ошибка вставки спайна в плейсхолдер");
+                    }
+                } else {
+                    this.container.addChild(item.spine);
+                }
+
+
+
+            });
 
             this.setAndPlayAnimation(reversedItems);
         },
@@ -101,7 +119,6 @@ export default {
             this.timeline?.timeScale(this.speed);
         },
         scale() {
-            console.log(this.scale);
             this.updateSize();
         }
     },
@@ -153,12 +170,18 @@ export default {
             });
             this.timeline?.timeScale(this.speed);
             items.forEach(item => {
-                this.container.addChild(item.spine);
+
+                // item.spine.reset();
+                // this.container.addChild(item.spine);
                 item.spine.autoUpdate = false;
                 item.spine.update(0);
                 item.animations.forEach((animation) => {
                     const crutch = { trackTime: 0 };
                     let track;
+
+                    item.spine.state.setAnimation(0, animation.pickedAnimation.name).trackTime = 0;
+                    item.spine.update(1 / 60);
+
                     this.timeline
                         .to(crutch, {
                             trackTime: animation.pickedAnimation.duration,
