@@ -67,10 +67,10 @@ export default {
     font-size: 14px
     overflow: hidden
     //width: max-content
-    height: calc(100% - 20px)
+    height: 100%
     background-color: var(--color-light)
     box-shadow: var(--shadow)
-    min-width: calc(100% - 20px)
+    min-width: 100%
     position: relative
     &__top
         display: flex
