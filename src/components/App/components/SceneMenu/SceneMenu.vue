@@ -28,7 +28,7 @@
 <script>
 import * as PIXI from "pixi.js";
 // import "pixi-spine";
-import "pixi-spine_v3.8";
+// import "pixi-spine_v3.8";
 import gsap from "gsap";
 import { Sketch } from "@ckpack/vue-color";
 export default {

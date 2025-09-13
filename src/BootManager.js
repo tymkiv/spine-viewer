@@ -1,24 +1,56 @@
-import * as PIXI from "pixi.js";
-// import "pixi-spine";
-import "pixi-spine_v3.8";
 import { v4 } from "uuid";
-import Spine from "./Spine";
+import * as PIXI from "pixi.js";
+import "pixi.js-legacy";
+import { TextureAtlas } from "@pixi-spine/base";
+import * as spine37 from "@pixi-spine/runtime-3.7";
+import * as spine38 from "@pixi-spine/runtime-3.8";
 
-function createSpineData(json, atlas, png) {
-    const rawSkeletonData = JSON.parse(json.result.data);
-    const rawAtlasData = atlas.result.data;
-    const spineAtlas = new PIXI.spine.core.TextureAtlas(rawAtlasData, (line, callback) => {
-        const img = new Image();
-        img.src = png.find(data => data.name === line).result.data;
-        PIXI.utils.BaseTextureCache[line] = new PIXI.BaseTexture(img); // Добавляем картинку в хеш
-        PIXI.utils.BaseTextureCache[line].mipmap = false;
-        callback(PIXI.BaseTexture.fromImage(line));
+export function createSpineData(json, atlas, pngPages, preferRuntime = "auto") {
+
+    const rawSkeletonData = typeof json === "string" ? JSON.parse(json) : JSON.parse(json.result.data);
+    const rawAtlasText = typeof atlas === "string" ? atlas : atlas.result.data;
+
+    const versionStr = String(rawSkeletonData && rawSkeletonData.skeleton && rawSkeletonData.skeleton.spine || '');
+    const use37 = preferRuntime === "3.7" || (preferRuntime === "auto" && versionStr.startsWith("3.7"));
+    const R = use37 ? spine37 : spine38;
+
+    const atlasObj = new TextureAtlas(rawAtlasText, (pageName, done) => {
+        const page = pngPages.find(p => p.name === pageName);
+        if (!page) {
+            throw new Error(`Не найдена страница атласа "${pageName}"`);
+        }
+
+        const src =
+            (page.result && page.result.data) ||
+            page.data ||
+            page.url;
+
+        const baseTex = PIXI.BaseTexture.from(src);
+        baseTex.mipmap = PIXI.MIPMAP_MODES.OFF;
+        done(baseTex);
     });
-    const spineAtlasLoader = new PIXI.spine.core.AtlasAttachmentLoader(spineAtlas);
-    // console.log(spineAtlasLoader);
-    const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
 
-    return spineJsonParser.readSkeletonData(rawSkeletonData);
+    const attachmentLoader = new R.AtlasAttachmentLoader(atlasObj);
+    const jsonParser = new R.SkeletonJson(attachmentLoader);
+
+    const result = jsonParser.readSkeletonData(rawSkeletonData);
+    result.R = R;
+
+    return result;
+}
+
+export function createSpineDisplay(json, atlas, pngPages, preferRuntime = "auto") {
+    const data = createSpineData(json, atlas, pngPages, preferRuntime);
+
+    const versionStr =
+        typeof json === "string"
+            ? (JSON.parse(json).skeleton && JSON.parse(json).skeleton.spine) || ''
+            : (JSON.parse(json.result.data).skeleton && JSON.parse(json.result.data).skeleton.spine) || '';
+
+    const use37 = preferRuntime === "3.7" || (preferRuntime === "auto" && String(versionStr).startsWith("3.7"));
+    const R = use37 ? spine37 : spine38;
+
+    return new R.Spine(data);
 }
 
 function traverseFileTree(item, path = "", folder) {
@@ -200,7 +232,8 @@ export function prepareItemsForLayersMenu(files) {
                 id: v4()
             }));
 
-            item.spine = new PIXI.spine.Spine(item.spineData);
+            // item.spine = new PIXI.spine.Spine(item.spineData);
+            item.spine = new item.spineData.R.Spine(item.spineData);
             item.probableAnimations = probableAnimations;
             item.animations = [{ timeStart: 0, pickedAnimation: probableAnimations[0], id: v4() }];
 

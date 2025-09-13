@@ -1,7 +1,8 @@
 // import { globalTicker, dispatcher } from "instances";
 import * as PIXI from "pixi.js";
 // import "pixi-spine";
-import "pixi-spine_v3.8";
+// import "pixi-spine_v3.8";
+import { Spine as SuperSpine } from "pixi-spine";
 import gsap from "gsap";
 
 const isObject = a => {
@@ -11,7 +12,7 @@ const isFunction = a => {
     return a && {}.toString.call(a) === "[object Function]";
 };
 
-class Spine extends PIXI.spine.Spine {
+class Spine extends SuperSpine {
     constructor(spineData) {
         super(spineData);
         this.autoUpdate = false;
