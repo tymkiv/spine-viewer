@@ -294,6 +294,8 @@ export function prepareItemsForLayersMenu(files) {
 
             item.sprite = new PIXI.Sprite(item.texture);
 
+            item.sprite.anchor.set(0.5);
+
             item.rawPositionX = 0;
             item.rawPositionY = 0;
             item.positionX = 0;

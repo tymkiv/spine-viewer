@@ -57,9 +57,18 @@
                 v-else
                 class="item-header"
             >
-                <h2 class="item-name">
-                    {{ item.name }}
-                </h2>
+                <div class="item-name-container">
+                    <span
+                        class="item-visible"
+                        :class="{'visible': item.displayObject.visible}"
+                        @click="item.displayObject.visible = !item.displayObject.visible"
+                    >
+                </span>
+                    <h2 class="item-name">
+                        {{ item.name }}
+                    </h2>
+                </div>
+
 
                 <btn-remove @click.stop="onBtnRemoveClick(item)" />
             </div>
@@ -237,6 +246,41 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.item-name-container
+    display: flex
+    align-items: center
+    color: inherit
+
+.item-visible
+    position: relative
+    display: inline-block
+    width: 20px
+    height: 20px
+    cursor: pointer
+    flex-shrink: 0
+    margin-right: 5px
+    &:before
+        content: ""
+        position: absolute
+        width: 14px
+        height: 14px
+        top: 5px
+        left: 3px
+        background-image: url("../../../../../../../../resources/eye-closed.svg")
+        background-position: center
+        background-repeat: no-repeat
+        background-size: contain
+    &:hover
+        transform: scale(1.05)
+    &:active
+        transform: scale(0.95)
+    &:focus-visible
+        outline: 2px solid rgba(0, 113, 227, .35)
+        border-radius: 4px
+    &.visible
+        &:before
+            top: 4px
+            background-image: url("../../../../../../../../resources/eye-visible.svg")
 .list-item
     transition: all 0.3s ease
     position: relative
