@@ -12,8 +12,10 @@
                 class="plate"
                 :class="{'draggable': inDrag}"
                 @dragstart.prevent
+                @select.prevent
                 @mousedown="mousedown($event)"
             >
+                <CopyButton :value="pickedAnimation.name" @mousedown.stop @dragstart.prevent @select.prevent style="margin-right: 5px" />
                 <select
                     class="plate__select"
                     @mousedown.stop
@@ -40,8 +42,9 @@
 <script>
 import gsap from "gsap";
 import BtnRemove from "../../../../../BtnRemove";
+import CopyButton from "../../../../../CopyButton/CopyButton.vue";
 export default {
-    components: { BtnRemove },
+    components: { BtnRemove, CopyButton },
     props: {
         scroller: {
             type: [null, HTMLDivElement],
@@ -223,6 +226,9 @@ export default {
     padding: 0 30px 0 30px
     cursor: grab
     position: relative
+    display: flex
+    align-items: center
+
     &.draggable
         box-shadow: 0 0 4px 1px #{rgba(#111, 0.25)}
 

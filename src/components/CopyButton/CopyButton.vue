@@ -77,6 +77,8 @@ export default {
 <style scoped lang="sass">
 .copy-button
     position: relative
+    display: flex
+    align-items: center
     &__copy-icon
         position: relative
         display: inline-block
