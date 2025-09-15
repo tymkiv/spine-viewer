@@ -45,10 +45,21 @@
                         <div class="block">
                             <div class="block__row">
                                 <span class="block__title">Placeholder</span>
-                                <select  class="placeholder-selector" @change="placeholderChange($event)" :value="this.$store.getters['layers/itemToRedact'].placeholder_name">
-                                    <option :value="undefined"> select placeholder </option>
-                                    <option v-for="slot in [...parent.spineData.slots.filter(({ name }) => name.startsWith('pla')), ...parent.spineData.slots.filter(({ name }) => !name.startsWith('pla')).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true }))]" :value="slot.name"> {{ slot.name }} </option>
+                                <select
+                                    class="placeholder-selector"
+                                    v-model="placeholderName"
+                                >
+                                    <option value="" disabled>select placeholder</option>
+
+                                    <option
+                                        v-for="slot in sortedSlots"
+                                        :key="slot.name"
+                                        :value="slot.name"
+                                    >
+                                        {{ slot.name }}
+                                    </option>
                                 </select>
+
                             </div>
                         </div>
                     </template>
@@ -123,6 +134,26 @@ export default {
         },
         parent() {
             return this.child?.childFor;
+        },
+        // прокси к стору
+        placeholderName: {
+            get() {
+                return this.$store.getters["layers/itemToRedact"].placeholder_name ?? "";
+            },
+            set(v) {
+                if (v === "" || v === null) return;
+
+                this.$store.dispatch("layers/changePlaceholder", { item: this.$store.getters["layers/itemToRedact"], placeholder: v });
+            }
+        },
+        // разложим pla* первыми, остальные — по алфавиту
+        sortedSlots() {
+            const slots = this.parent.spineData?.slots ?? [];
+            const pla = [];
+            const rest = [];
+            for (const s of slots) (s.name.startsWith("pla") ? pla : rest).push(s);
+            rest.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+            return [...pla, ...rest];
         }
     },
     watch: {
@@ -195,6 +226,8 @@ export default {
     box-shadow: inset 0 0 2px #11111154
     border: none
     outline: none
+    -webkit-appearance: none
+    text-align: center
 
 
 
