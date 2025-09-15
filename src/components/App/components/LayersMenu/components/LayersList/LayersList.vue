@@ -123,6 +123,13 @@ export default {
             const borderBottom = height - 10;
 
             this.dropTargetPlace = y <= borderTop ? "top" : y >= borderBottom ? "bottom" : "self";
+
+            // запрет вставить в спрайт
+            if (this.dropTarget.sprite && this.dropTargetPlace === "self") {
+                this.dropTarget = null;
+                this.dropTargetPlace = null;
+                return;
+            }
         },
 
         dragleave(event) {
