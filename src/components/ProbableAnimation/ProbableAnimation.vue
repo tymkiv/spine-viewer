@@ -35,7 +35,7 @@
         <CollapsibleContainer
             ref="container"
             :default-open="defaultOpen"
-            padding-bottom="0"
+            :padding-bottom="0"
         >
             <ProbableAnimationEvent
                 v-for="event in events"

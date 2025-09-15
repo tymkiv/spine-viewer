@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { throttle } from "lodash";
 import * as PIXI from "pixi.js";
 // import "pixi-spine";
 // import "pixi-spine_v3.8";
@@ -45,6 +46,9 @@ export default {
             moveStartPoint: null
         };
     },
+    created() {
+        this.showByUserCursorThrottled = throttle(this.showByUserCursor, 1000 / 60); // 1 раз в сек
+    },
     computed: {
         items() {
             return this.$store.getters["layers/timelineItems"];
@@ -63,9 +67,29 @@ export default {
         },
         scale() {
             return this.$store.getters["app/scale"];
+        },
+        isUserCursorActive() {
+            return this.$store.getters["app/activeUserCursor"];
+        },
+        userCursor() {
+            return this.$store.getters["app/userCursor"];
         }
     },
     watch: {
+        isUserCursorActive() {
+            if (this.isUserCursorActive) {
+                this.timeline?.pause();
+                this.showByUserCursor();
+            } else {
+                this.timeline?.time(this.userCursor);
+                this.timeline?.play();
+            }
+        },
+        userCursor() {
+            if (!this.isUserCursorActive) return;
+
+            this.showByUserCursorThrottled();
+        },
         isPlay() {
             if (this.isPlay) {
                 if (this.timeline) {
@@ -86,7 +110,6 @@ export default {
             gsap.set(this.$refs["color-trigger"], { backgroundColor: this.colors.hex });
         },
         items(newItems, oldItems) {
-          console.log({ newItems, oldItems })
             oldItems.forEach(item => {
                 if (item.itemType === "spine") item.spine.parent?.removeChild(item.spine);
                 if (item.itemType === "sprite") item.sprite.parent?.removeChild(item.sprite);
@@ -153,6 +176,29 @@ export default {
         this.$nextTick(this.updateSize);
     },
     methods: {
+        showByUserCursor() {
+            this.items.forEach(item => {
+
+                if (item.itemType !== "spine") return;
+
+                item.spine.autoUpdate = false;
+                item.animations.filter((animation) => {
+                    const trackTime = this.userCursor - animation.timeStart;
+                    return trackTime >= 0 && trackTime <= animation.pickedAnimation.duration;
+                }).forEach((animation) => {
+                    const trackTime = this.userCursor - animation.timeStart;
+                    const computedTrackTime = Math.min(Math.max(0, trackTime), animation.pickedAnimation.duration);
+
+
+                    if (item.spine.state.tracks[0]?.animation?.name !== animation.pickedAnimation.name) {
+                        item.spine.state.setAnimation(0, animation.pickedAnimation.name);
+                    }
+
+                    item.spine.state.tracks[0].trackTime = computedTrackTime;
+                    item.spine.update(1 / 60);
+                });
+            });
+        },
         onPointerDown(event) {
             this.inMove = true;
             this.moveStartPoint = { x: event.pageX, y: event.pageY };
@@ -179,8 +225,6 @@ export default {
             this.moveStartPoint.y = event.pageY;
 
             const item = this.$store.getters["layers/itemToRedact"];
-
-            console.log({item, deltaX, deltaY})
 
             if (!item) return;
 

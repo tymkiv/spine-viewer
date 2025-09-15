@@ -4,12 +4,15 @@
         <div class="header">
             Timeline
         </div>
+        <div ref="cursor" class="time-ruler__cursor" :style="cursorStyle"> {{ userTimeCursor.toFixed(2) }} </div>
         <div
             ref="scroller"
             class="list-wrapper"
             @scroll="$emit('onscroll', $event.target.scrollTop)"
         >
             <div class="scroller-wrapper">
+                <TimeRuler />
+                <div class="user-time-cursor" ref="user-time-cursor"></div>
                 <div class="time-cursor" ref="time-cursor"></div>
                 <transition-group
                     name="list"
@@ -40,11 +43,12 @@
 
 <script>
 import gsap from "gsap";
+import TimeRuler from "../../../../../TimeRuler/TimeRuler.vue";
 import TimelineSpineItem from "../TimelineSpineItem";
 import { v4 } from "uuid";
 
 export default {
-    components: { TimelineSpineItem },
+    components: { TimeRuler, TimelineSpineItem },
 
     props: {
         scrollTop: {
@@ -63,11 +67,26 @@ export default {
         };
     },
     computed: {
+        cursorStyle() {
+            return {
+                transform: `translateX(${this.userTimeCursor * 200 - (this.$refs.scroller?.scrollLeft || 0)}px)`,
+                opacity: this.userTimeCursorShow ? 1 : 0
+            };
+        },
         itemsHeight() {
             return this.items.map((item) => this.getHeight(item));
         },
         timeCursor() {
             return this.$store.getters["app/timeCursor"];
+        },
+        userTimeCursor() {
+            return this.$store.getters["app/userCursor"];
+        },
+        userTimeCursorShow() {
+            return this.$store.getters["app/showUserCursor"];
+        },
+        userTimeCursorActive() {
+            return this.$store.getters["app/activeUserCursor"];
         }
     },
     watch: {
@@ -76,7 +95,17 @@ export default {
         },
         timeCursor() {
             gsap.set(this.$refs["time-cursor"], { x: this.timeCursor * 200 });
+        },
+        userTimeCursor() {
+            gsap.set(this.$refs["user-time-cursor"], { x: this.userTimeCursor * 200 });
+        },
+        userTimeCursorShow() {
+            gsap.set(this.$refs["user-time-cursor"], { opacity: this.userTimeCursorShow ? 1 : 0 });
+        },
+        userTimeCursorActive() {
+            gsap.set(this.$refs["time-cursor"], { opacity: this.userTimeCursorActive ? 0 : 1 });
         }
+
     },
     mounted() {
         this.scroller = this.$refs.scroller;
@@ -119,6 +148,20 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.time-ruler
+    &__cursor
+        top: 5px
+        left: 7px
+        position: absolute
+        pointer-events: none
+        display: inline-block
+        padding: 4px 5px
+        background: #ffd880
+        border-radius: 4px
+        box-shadow: 0 0 2px rgba(0,0,0,.14)
+        font-size: 10px
+        transition: opacity 0.3s
+        z-index: 1000000
 .list-enter-from, .list-leave-to
     opacity: 0
     height: 0 !important
@@ -127,6 +170,7 @@ export default {
     overflow: hidden
     box-shadow: var(--shadow)
     height: 100%
+    position: relative
 
 .header
     height: 25px
@@ -139,7 +183,7 @@ export default {
     box-shadow: var(--shadow)
     background-color: var(--color-light)
 
-.time-cursor
+.time-cursor, .user-time-cursor
     position: absolute
     width: 2px
     background-color: var(--color-accent)
@@ -150,10 +194,15 @@ export default {
     pointer-events: none
     will-change: transform
 
+.user-time-cursor
+    background-color: #ffd880
+    transition: opacity 0.3s
+    opacity: 0
+
 .scroller-wrapper
     min-height: 100%
     background-image: url("../../../../../../resources/pattern.svg")
-    background-position: 0 0
+    background-position: 0 20px
     position: relative
     width: fit-content
     min-width: 100%
@@ -166,6 +215,7 @@ export default {
         right: 0
         pointer-events: none
         background-image: url("../../../../../../resources/ruller-pattern.svg")
+        background-position: 0 20px
 .list-wrapper
     overflow: scroll
     position: relative

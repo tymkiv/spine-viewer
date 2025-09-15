@@ -41,7 +41,6 @@ export default {
     }),
     methods: {
         onEnter(event) {
-            console.log("onEnter", event.target);
             event.target.blur();
             // this.$refs.input.blur();
             this.$emit("change", event);

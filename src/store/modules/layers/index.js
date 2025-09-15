@@ -163,7 +163,6 @@ const getters = {
 
 const mutations = {
     _SELECT_ITEM_TO_REDACT(state, item) {
-        console.log("_SELECT_ITEM_TO_REDACT")
         state._ITEM_TO_REDACT = item;
     },
 
@@ -172,7 +171,6 @@ const mutations = {
     },
 
     _SELECT_SCENE_TO_DISPLAY(state, item) {
-        console.log("_SELECT_SCENE_TO_DISPLAY")
         state._SCENE_TO_DISPLAY = item;
     },
 

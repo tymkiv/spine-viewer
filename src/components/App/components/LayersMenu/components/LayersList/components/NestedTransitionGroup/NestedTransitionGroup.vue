@@ -194,9 +194,7 @@ export default {
                 this.$store.dispatch("layers/unselectItemToRedact");
                 this.$store.dispatch("layers/selectSceneToDisplay", item);
             } else {
-              console.log({ item })
                 this.$store.dispatch("layers/selectItemToRedact", item);
-
 
                 const find = (parent, needed) => {
                     if (!parent.items) return;
