@@ -172,6 +172,10 @@ const mutations = {
 
     _SELECT_SCENE_TO_DISPLAY(state, item) {
         state._SCENE_TO_DISPLAY = item;
+
+        if (state._ITEM_TO_REDACT === null) {
+            state._ITEM_TO_REDACT = state._SCENE_TO_DISPLAY.items[0];
+        }
     },
 
     _UNSELECT_SCENE_TO_DISPLAY(state) {
