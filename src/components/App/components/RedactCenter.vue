@@ -2,8 +2,6 @@
 
     <div class="redact">
         <div class="redact__main-container">
-
-
             <h2 class="redact__top">
                 <span class="redact__top__title">Edit center</span>
                 <template v-if="$store.getters['layers/sceneToDisplay']">
@@ -11,23 +9,8 @@
                     <EditableText v-model="$store.getters['layers/sceneToDisplay'].name" />
                 </template>
             </h2>
-<!--            <template v-if="$store.getters['layers/sceneToDisplay']">-->
-<!--                &lt;!&ndash;        <button class="redact-center__close" @click="$store.dispatch('layers/unselectItemToRedact')"> x </button>&ndash;&gt;-->
-<!--                <label class="name">-->
-<!--                    <span class="text">Scene:</span>-->
-<!--                    <input-->
-<!--                        ref="redact-name"-->
-<!--                        type="text"-->
-<!--                        :value="$store.getters['layers/sceneToDisplay'].name"-->
-<!--                        @input="redactSceneName($event.target.value)"-->
-<!--                    >-->
-<!--                </label>-->
-
-<!--            </template>-->
 
             <template v-if="$store.getters['layers/itemToRedact']">
-                <!--        <button class="redact-center__close" @click="$store.dispatch('layers/unselectItemToRedact')"> x </button>-->
-
                 <div class="blocks">
                     <div class="block">
                         <div class="block__row">
@@ -56,6 +39,19 @@
                             <DefaultButton name="Reset" @on-click="resetPosition()" style="margin-left: auto" />
                         </div>
                     </div>
+
+
+                    <template v-if="parent">
+                        <div class="block">
+                            <div class="block__row">
+                                <span class="block__title">Placeholder</span>
+                                <select  class="placeholder-selector" @change="placeholderChange($event)" :value="this.$store.getters['layers/itemToRedact'].placeholder_name">
+                                    <option :value="undefined"> select placeholder </option>
+                                    <option v-for="slot in [...parent.spineData.slots.filter(({ name }) => name.startsWith('pla')), ...parent.spineData.slots.filter(({ name }) => !name.startsWith('pla')).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true }))]" :value="slot.name"> {{ slot.name }} </option>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
 
                     <template v-if="$store.getters['layers/itemToRedact'].spine">
                         <div class="block">
@@ -95,63 +91,9 @@
 
                     </template>
                 </div>
-
-
-                <label class="name">
-                    <span class="text">Spine:</span>
-                    <input
-                        ref="redact-name"
-                        type="text"
-                        :value="$store.getters['layers/itemToRedact'].name"
-                        @input="redactItem($event.target.value)"
-                    >
-                </label>
-
-                <label class="name">
-                    <span class="text">X:</span>
-                    <input
-                        ref="redact-name"
-                        type="text"
-                        :value="$store.getters['layers/itemToRedact'].positionX"
-                        @input="redactItemX($event)"
-                    >
-                </label>
-
-                <label class="name">
-                    <span class="text">Y:</span>
-                    <input
-                        ref="redact-name"
-                        type="text"
-                        :value="$store.getters['layers/itemToRedact'].positionY"
-                        @input="redactItemY($event)"
-                    >
-                </label>
-
-                <ul>
-                    <li
-                        v-for="animation in $store.getters['layers/itemToRedact'].animations"
-                        :key="animation.pickedAnimation.name"
-                    >
-                        <div>
-                            <span>{{ animation.pickedAnimation.name }}</span>
-                            <span>start: {{ (animation.timeStart).toFixed(2) }}</span>
-                            <span>duration: {{ (animation.pickedAnimation.duration).toFixed(2) }}</span>
-                        </div>
-                    </li>
-                </ul>
-
             </template>
 
-            <template v-if="parent">
-                <label class="placeholder">
-                    <span class="text">Placeholder:</span>
-                    <select @change="placeholderChange($event)" :value="this.$store.getters['layers/itemToRedact'].placeholder_name">
-                        <option :value="undefined"> select placeholder </option>
-                        <option v-for="slot in parent.spineData.slots" :value="slot.name"> {{ slot.name }} </option>
-                    </select>
-                </label>
 
-            </template>
         </div>
     </div>
 
@@ -240,6 +182,22 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.placeholder-selector
+    height: 30px
+    padding: 0 5px
+    min-width: 30px
+    background-color: var(--color-light)
+    cursor: pointer
+    border-radius: 5px
+    flex-direction: row
+    justify-items: center
+    display: flex
+    box-shadow: inset 0 0 2px #11111154
+    border: none
+    outline: none
+
+
+
 .redact
     //padding: 10px
     font-size: 14px
