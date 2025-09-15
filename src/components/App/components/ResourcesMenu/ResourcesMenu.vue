@@ -26,6 +26,7 @@ export default {
     components: { ResourcesList },
     methods: {
         createClick() {
+          console.log("createClick")
             const layers = this.$store.getters["resources/checkedItems"].map(resource => {
                 const layer = {
                     type: "item",

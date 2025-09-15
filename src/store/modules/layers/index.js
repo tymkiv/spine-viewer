@@ -163,6 +163,7 @@ const getters = {
 
 const mutations = {
     _SELECT_ITEM_TO_REDACT(state, item) {
+        console.log("_SELECT_ITEM_TO_REDACT")
         state._ITEM_TO_REDACT = item;
     },
 
@@ -171,6 +172,7 @@ const mutations = {
     },
 
     _SELECT_SCENE_TO_DISPLAY(state, item) {
+        console.log("_SELECT_SCENE_TO_DISPLAY")
         state._SCENE_TO_DISPLAY = item;
     },
 
@@ -180,6 +182,27 @@ const mutations = {
 
     _REDACT_ITEM(state, name) {
         state._ITEM_TO_REDACT.name = name;
+    },
+
+    _REDACT_ITEM_X(state, x) {
+        state._ITEM_TO_REDACT.rawPositionX = x;
+        state._ITEM_TO_REDACT.positionX = Math.round(x);
+        state._ITEM_TO_REDACT.displayObject.x = Math.round(x);
+        // if (state._ITEM_TO_REDACT.spine) state._ITEM_TO_REDACT.spine.x = x;
+        // if (state._ITEM_TO_REDACT.sprite) state._ITEM_TO_REDACT.sprite.x = x;
+    },
+
+    _REDACT_ITEM_Y(state, y) {
+        state._ITEM_TO_REDACT.rawPositionY = y;
+        state._ITEM_TO_REDACT.positionY = Math.round(y);
+        state._ITEM_TO_REDACT.displayObject.y = Math.round(y);
+        // state._ITEM_TO_REDACT.rawPosition = { x: state._ITEM_TO_REDACT.rawPosition.x, y };
+        // if (state._ITEM_TO_REDACT.spine) state._ITEM_TO_REDACT.spine.y = y;
+        // if (state._ITEM_TO_REDACT.sprite) state._ITEM_TO_REDACT.sprite.y = y;
+    },
+
+    _REDACT_SCENE_NAME(state, name) {
+        state._SCENE_TO_DISPLAY.name = name;
     },
 
     _REMOVE_ITEM(state, item) {
@@ -233,6 +256,18 @@ const actions = {
         commit("_REDACT_ITEM", name);
     },
 
+    redactItemX({ commit }, x) {
+        commit("_REDACT_ITEM_X", x);
+    },
+
+    redactItemY({ commit }, y) {
+        commit("_REDACT_ITEM_Y", y);
+    },
+
+    redactSceneName({ commit }, name) {
+        commit("_REDACT_SCENE_NAME", name);
+    },
+
     removeItem({ commit }, item) {
         commit("_REMOVE_ITEM", item);
     },
@@ -255,6 +290,7 @@ const actions = {
 
     loadItems({ commit, state }, items) {
         commit("_LOAD_ITEMS", items);
+        commit("_UNSELECT_ITEM_TO_REDACT");
         commit("_SELECT_SCENE_TO_DISPLAY", state._ITEMS[state._ITEMS.length - 1]);
     },
 

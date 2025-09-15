@@ -14,7 +14,7 @@
             :class="{'open': colorPickerOpen}"
             @click="colorPickerOpen = !colorPickerOpen"
         ></div>
-        <canvas ref="scene" @wheel="onWheel($event)"></canvas>
+        <canvas ref="scene" @wheel="onWheel($event)" @pointerdown="onPointerDown($event)"></canvas>
         <div class="scale-prompt">
             <button class="scale-prompt__btn" @click="$store.dispatch('app/setScale', Math.min(Math.max(1 / Number((1 / scale - 0.1).toFixed(1)), 0.25), 4))"> - </button>
             <div class="scale-prompt__info">
@@ -40,7 +40,9 @@ export default {
             app: null,
             container: new PIXI.Container(),
             colors: "#cccccc",
-            colorPickerOpen: false
+            colorPickerOpen: false,
+            inMove: false,
+            moveStartPoint: null
         };
     },
     computed: {
@@ -84,8 +86,11 @@ export default {
             gsap.set(this.$refs["color-trigger"], { backgroundColor: this.colors.hex });
         },
         items(newItems, oldItems) {
+          console.log({ newItems, oldItems })
             oldItems.forEach(item => {
-                item.spine.parent?.removeChild(item.spine);
+                if (item.itemType === "spine") item.spine.parent?.removeChild(item.spine);
+                if (item.itemType === "sprite") item.sprite.parent?.removeChild(item.sprite);
+
             });
 
             const reversedItems = [...newItems].reverse();
@@ -101,19 +106,25 @@ export default {
                     if (slot?.currentSprite) {
                         slot.currentSprite.texture = void (0);
                         // removeChildren && slot.currentSprite.removeChildren();
-                        slot.currentSprite.addChild(item.spine);
+
+                        if (item.itemType === "spine") slot.currentSprite.addChild(item.spine);
+                        if (item.itemType === "sprite") slot.currentSprite.addChild(item.sprite);
+
                     } else {
                         console.log("Ошибка вставки спайна в плейсхолдер");
                     }
                 } else {
-                    this.container.addChild(item.spine);
+                    if (item.itemType === "spine") this.container.addChild(item.spine);
+                    if (item.itemType === "sprite") this.container.addChild(item.sprite);
                 }
 
 
 
             });
 
-            this.setAndPlayAnimation(reversedItems);
+            const isTheSame = newItems.every(({ id }) => oldItems.some(item => item.id === id));
+
+            if (!isTheSame) this.setAndPlayAnimation(reversedItems);
         },
         speed() {
             this.timeline?.timeScale(this.speed);
@@ -142,6 +153,61 @@ export default {
         this.$nextTick(this.updateSize);
     },
     methods: {
+        onPointerDown(event) {
+            this.inMove = true;
+            this.moveStartPoint = { x: event.pageX, y: event.pageY };
+
+            window.addEventListener("pointermove", this.onPointerMove);
+            window.addEventListener("pointerup", this.onPointerUp);
+            // window.addEventListener("pointerleave", this.onPointerUp);
+        },
+        onPointerUp(event) {
+            this.inMove = false;
+            this.moveStartPoint = null;
+
+            window.removeEventListener("pointermove", this.onPointerMove);
+            window.removeEventListener("pointerup", this.onPointerUp);
+            // window.removeEventListener("pointerleave", this.onPointerUp);
+        },
+        onPointerMove(event) {
+            if (!this.inMove || this.moveStartPoint === null) return;
+
+            const deltaX = event.pageX - this.moveStartPoint.x;
+            const deltaY = event.pageY - this.moveStartPoint.y;
+
+            this.moveStartPoint.x = event.pageX;
+            this.moveStartPoint.y = event.pageY;
+
+            const item = this.$store.getters["layers/itemToRedact"];
+
+            console.log({item, deltaX, deltaY})
+
+            if (!item) return;
+
+            this.$store.dispatch("layers/redactItemX", item.rawPositionX + deltaX * this.scale);
+            this.$store.dispatch("layers/redactItemY", item.rawPositionY + deltaY * this.scale);
+
+            // item.rawPositionX += deltaX * this.scale;
+            // item.rawPositionY += deltaY * this.scale;
+            //
+            // item.positionX = Math.round(item.rawPositionX);
+            // item.positionY = Math.round(item.rawPositionY);
+
+            // item.rawPosition = {
+            //     x: item.rawPosition.x + deltaX * this.scale,
+            //     y: item.rawPosition.y + deltaY * this.scale
+            // };
+
+            // let displayObject;
+            // if (item.spine) displayObject = item.spine;
+            // if (item.sprite) displayObject = item.sprite;
+
+            // if (displayObject) {
+            //     displayObject.x += deltaX * this.scale;
+            //     displayObject.y += deltaY * this.scale;
+            // }
+          // console.log(event);
+        },
         onWheel(event) {
             const scale = Math.min(Math.max(this.scale + event.deltaY / 100, 0.25), 4);
             this.$store.dispatch("app/setScale", scale);
@@ -170,6 +236,8 @@ export default {
             });
             this.timeline?.timeScale(this.speed);
             items.forEach(item => {
+
+                if (item.itemType !== "spine") return;
 
                 // item.spine.reset();
                 // this.container.addChild(item.spine);

@@ -30,6 +30,17 @@
                         :value="item.name"
                         @change="$store.dispatch('layers/selectSceneToDisplay', item)"
                     >
+<!--                  <svg class="radio-label__fake-input" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">-->
+<!--                    <path d="m12 2 9 5-9 5-9-5 9-5z"/>-->
+<!--                    <path d="m3 12 9 5 9-5"/>-->
+<!--                    <path d="m3 17 9 5 9-5"/>-->
+<!--                  </svg>-->
+<!--                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">-->
+<!--                    <path d="M12 2 20 7v10l-8 5-8-5V7z"/>-->
+<!--                    <path d="M12 22V12L4 7m8 5 8-5"/>-->
+<!--                  </svg>-->
+
+                  <!--                    <img class="radio-label__fake-input" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%20%20%3Cpath%20d%3D%22m12%202%209%205-9%205-9-5%209-5z%22%3E%3C%2Fpath%3E%0A%20%20%3Cpath%20d%3D%22m3%2012%209%205%209-5%22%3E%3C%2Fpath%3E%0A%20%20%3Cpath%20d%3D%22m3%2017%209%205%209-5%22%3E%3C%2Fpath%3E%0A%3C%2Fsvg%3E%0A">-->
                     <span class="radio-label__fake-input" />
                 </label>
 
@@ -180,9 +191,27 @@ export default {
         onItemSelect(item) {
 
             if (item.type === "scene") {
+                this.$store.dispatch("layers/unselectItemToRedact");
                 this.$store.dispatch("layers/selectSceneToDisplay", item);
             } else {
+              console.log({ item })
                 this.$store.dispatch("layers/selectItemToRedact", item);
+
+
+                const find = (parent, needed) => {
+                    if (!parent.items) return;
+                    return parent.items.some(item => item === needed || find(item, needed));
+                };
+
+              // console.log({ item })
+              // console.log(this.$store.getters["layers/items"])
+              //
+              // this.$store.getters["layers/items"].forEach(scene => console.log({ scene }))
+
+              const scene = this.$store.getters["layers/items"].find(scene => find(scene, item));
+              this.$store.dispatch("layers/selectSceneToDisplay", scene);
+
+              // console.log(this.$store.getters["layers/items"].find(({ items }) => items))
                 // this.$store.dispatch("app/addListener", {
                 //     type: "click",
                 //     callback: () => this.$store.dispatch("layers/unselectItemToRedact"),

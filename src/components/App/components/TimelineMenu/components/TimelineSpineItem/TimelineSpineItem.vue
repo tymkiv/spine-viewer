@@ -21,7 +21,7 @@
             />
         </li>
     </transition-group>
-    <div class="add-btn">
+    <div v-if="probableAnimations.length" class="add-btn">
         <button
             class="add-btn__btn"
             @click="$emit('addClick')"

@@ -83,18 +83,24 @@ export default {
     },
     methods: {
         getHeight(item) {
-            const height = 90;
+                const height = 90;
 
-            return height * (item.animations.length + 1);
+                return height * (item.animations.length + 1);
+
+            // return 0;
         },
         scrollLeft(value) {
             this.$refs.scroller.scrollLeft = value;
         },
         addClick(item) {
+            const timeStart = item.animations.reduce((acc, item) => {
+                return Math.max(acc, item.timeStart + item.pickedAnimation.duration);
+            }, 0);
+
             const animation = {
                 id: v4(),
                 pickedAnimation: item.probableAnimations[0],
-                timeStart: 0
+                timeStart
             };
 
             this.$store.dispatch("layers/addAnimationToItem", { item, animation });

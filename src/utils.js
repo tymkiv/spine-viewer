@@ -61,10 +61,16 @@ export const findIndexes = (items, item) => {
 export const flat = (items, parent) => {
     const result = [];
 
+    // console.log({ items })
+
     if (items) {
         for (let i = 0; i < items.length; i++) {
-            if (items[i].spine) {
-                const newObj = { ...items[i], items: [] };
+            let itemType;
+            if (items[i].spine) itemType = "spine";
+            if (items[i].sprite) itemType = "sprite";
+
+            if (itemType) {
+                const newObj = { animations: [], probableAnimations: [], ...items[i], items: [], itemType };
                 if (parent) {
                     newObj.childFor = parent;
                 }
@@ -77,8 +83,13 @@ export const flat = (items, parent) => {
 
                 result.push(newObj, ...children);
             }
+            // if (items[i].spine) {
+
+            // }
         }
     }
+
+    // console.log({ result })
 
     return result;
 };

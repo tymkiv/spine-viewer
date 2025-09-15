@@ -5,6 +5,8 @@ import { TextureAtlas } from "@pixi-spine/base";
 import * as spine37 from "@pixi-spine/runtime-3.7";
 import * as spine38 from "@pixi-spine/runtime-3.8";
 
+window.PIXI = PIXI;
+
 export function createSpineData(json, atlas, pngPages, preferRuntime = "auto") {
 
     const rawSkeletonData = typeof json === "string" ? JSON.parse(json) : JSON.parse(json.result.data);
@@ -226,16 +228,48 @@ export function prepareItemsForLayersMenu(files) {
                 spineData: createSpineData(jsonFile, atlasFile, pngFilesForSpine)
             };
 
-            const probableAnimations = item.spineData.animations.map(animation => ({
-                name: animation.name,
-                duration: animation.duration,
-                id: v4()
-            }));
+
+
+            const probableAnimations = item.spineData.animations.map(animation => {
+                const events = animation.timelines.find(timeline => timeline instanceof item.spineData.R.EventTimeline)?.events.map(event => {
+                    return { start: event.time, name: event.data.name, id: v4() }
+                }) || [];
+                // const p = new EventTimeline()
+                return {
+                    events,
+                    name: animation.name,
+                    duration: animation.duration,
+                    id: v4()
+                };
+            });
+
+
 
             // item.spine = new PIXI.spine.Spine(item.spineData);
             item.spine = new item.spineData.R.Spine(item.spineData);
             item.probableAnimations = probableAnimations;
             item.animations = [{ timeStart: 0, pickedAnimation: probableAnimations[0], id: v4() }];
+
+            item.rawPositionX = 0;
+            item.rawPositionY = 0;
+            item.positionX = 0;
+            item.positionY = 0;
+            item.displayObject = item.spine;
+
+            // let _rawPosition = { x: 0, y: 0 };
+            // Object.defineProperty(item, "rawPosition", {
+            //     set: value => {
+            //         _rawPosition.x = value.x;
+            //         _rawPosition.y = value.y;
+            //         item.spine.x = item.position.x;
+            //         item.spine.y = item.position.y;
+            //     },
+            //     get: () => _rawPosition
+            // });
+            //
+            // Object.defineProperty(item, "position", {
+            //     get: () => ({ x: Math.round(item.rawPosition.x), y: Math.round(item.rawPosition.y) })
+            // });
 
             return item;
         })
@@ -255,10 +289,16 @@ export function prepareItemsForLayersMenu(files) {
                 type: "item",
                 name: pngFile.name,
                 id: v4(),
-                texture: PIXI.Texture.from(PIXI.BaseTexture.fromImage(pngFile.name))
+                texture: PIXI.Texture.from(PIXI.BaseTexture.from(pngFile.name))
             };
 
             item.sprite = new PIXI.Sprite(item.texture);
+
+            item.rawPositionX = 0;
+            item.rawPositionY = 0;
+            item.positionX = 0;
+            item.positionY = 0;
+            item.displayObject = item.sprite;
 
             return item;
         })
