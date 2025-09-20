@@ -82,7 +82,7 @@ export default {
                 this.showByUserCursor();
             } else {
                 this.timeline?.time(this.userCursor);
-                this.timeline?.play();
+                if (this.isPlay) this.timeline?.play();
             }
         },
         userCursor() {

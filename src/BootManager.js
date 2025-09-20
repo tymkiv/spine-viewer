@@ -4,55 +4,100 @@ import "pixi.js-legacy";
 import { TextureAtlas } from "@pixi-spine/base";
 import * as spine37 from "@pixi-spine/runtime-3.7";
 import * as spine38 from "@pixi-spine/runtime-3.8";
+import * as spine41 from "@pixi-spine/runtime-4.1";
 
 window.PIXI = PIXI;
 
-export function createSpineData(json, atlas, pngPages, preferRuntime = "auto") {
+function versionFromJson(obj) {
+    return String(obj?.skeleton?.spine || "");
+}
 
-    const rawSkeletonData = typeof json === "string" ? JSON.parse(json) : JSON.parse(json.result.data);
+
+function versionFromSkel(arrayBuffer) {
+    // перші байти містять ASCII-версію (типу "4.1.17")
+    const bytes = new Uint8Array(arrayBuffer).slice(0, 64);
+    let s = "";
+    for (let i = 0; i < bytes.length; i++) {
+        const c = bytes[i];
+        s += (c >= 32 && c < 127) ? String.fromCharCode(c) : " ";
+    }
+    const m = s.match(/(\d+\.\d+(?:\.\d+)?)/);
+    return m ? m[1] : "";
+}
+
+function chooseRuntime(versionStr, preferRuntime = "auto") {
+    if (preferRuntime === "3.7") return spine37;
+    if (preferRuntime === "3.8") return spine38;
+    if (preferRuntime === "4.1") return spine41;
+
+    if (versionStr.startsWith("4.")) return spine41;
+    if (versionStr.startsWith("3.7")) return spine37;
+    if (versionStr.startsWith("3.8")) return spine38;
+
+    // дефолт — 3.8
+    return spine38;
+}
+
+export function createSpineData(skelOrJson, atlas, pngPages, preferRuntime = "auto") {
+    // --- визначаємо, що саме прийшло: JSON-текст чи ArrayBuffer .skel
+    let isBinary = false;
+    let jsonObj = null;
+    let binBuf = null;
+
+    if (typeof skelOrJson === "string") {
+        // якщо рядок і схожий на JSON
+        const t = skelOrJson.trim();
+        if (t.startsWith("{") || t.startsWith("[")) {
+            jsonObj = JSON.parse(skelOrJson);
+        } else {
+            throw new Error("String skeleton data must be JSON. For .skel pass ArrayBuffer.");
+        }
+    } else {
+        const data = skelOrJson?.result?.data ?? skelOrJson?.data;
+        if (data instanceof ArrayBuffer) { isBinary = true; binBuf = data; }
+        else if (typeof data === "string") { jsonObj = JSON.parse(data); }
+        else { throw new Error("Unknown skeleton data format"); }
+    }
+
+    // --- версія з JSON або з SKEL
+    const versionStr = isBinary ? versionFromSkel(binBuf) : versionFromJson(jsonObj);
+    const R = chooseRuntime(versionStr, preferRuntime);
+
+    // --- створюємо TextureAtlas (спільний для всіх версій)
     const rawAtlasText = typeof atlas === "string" ? atlas : atlas.result.data;
-
-    const versionStr = String(rawSkeletonData && rawSkeletonData.skeleton && rawSkeletonData.skeleton.spine || '');
-    const use37 = preferRuntime === "3.7" || (preferRuntime === "auto" && versionStr.startsWith("3.7"));
-    const R = use37 ? spine37 : spine38;
-
     const atlasObj = new TextureAtlas(rawAtlasText, (pageName, done) => {
         const page = pngPages.find(p => p.name === pageName);
-        if (!page) {
-            throw new Error(`Не найдена страница атласа "${pageName}"`);
-        }
+        if (!page) throw new Error(`Не знайдено сторінку атласу "${pageName}"`);
 
-        const src =
-            (page.result && page.result.data) ||
-            page.data ||
-            page.url;
-
+        const src = (page.result && page.result.data) || page.data || page.url;
         const baseTex = PIXI.BaseTexture.from(src);
         baseTex.mipmap = PIXI.MIPMAP_MODES.OFF;
+        // baseTex.alphaMode = PIXI.ALPHA_MODES.PMA;
+        // baseTex.alphaMode = PIXI.ALPHA_MODES.PREMULTIPLIED_ALPHA;
         done(baseTex);
     });
 
+    // --- парсимо скелет (JSON або SKEL)
     const attachmentLoader = new R.AtlasAttachmentLoader(atlasObj);
-    const jsonParser = new R.SkeletonJson(attachmentLoader);
+    let skeletonData;
 
-    const result = jsonParser.readSkeletonData(rawSkeletonData);
-    result.R = R;
+    if (isBinary) {
+        const bin = new R.SkeletonBinary(attachmentLoader);
+        skeletonData = bin.readSkeletonData(new Uint8Array(binBuf));
+    } else {
+        const jsonParser = new R.SkeletonJson(attachmentLoader);
+        skeletonData = jsonParser.readSkeletonData(jsonObj);
+    }
 
-    return result;
+    // Покладемо посилання на використаний рантайм (ти його далі читаєш як .R)
+    skeletonData.R = R;
+    skeletonData.__spineVersion = versionStr;
+    return skeletonData;
 }
 
-export function createSpineDisplay(json, atlas, pngPages, preferRuntime = "auto") {
-    const data = createSpineData(json, atlas, pngPages, preferRuntime);
-
-    const versionStr =
-        typeof json === "string"
-            ? (JSON.parse(json).skeleton && JSON.parse(json).skeleton.spine) || ''
-            : (JSON.parse(json.result.data).skeleton && JSON.parse(json.result.data).skeleton.spine) || '';
-
-    const use37 = preferRuntime === "3.7" || (preferRuntime === "auto" && String(versionStr).startsWith("3.7"));
-    const R = use37 ? spine37 : spine38;
-
-    return new R.Spine(data);
+export function createSpineDisplay(skelOrJson, atlas, pngPages, preferRuntime = "auto") {
+    const data = createSpineData(skelOrJson, atlas, pngPages, preferRuntime);
+    return new data.R.Spine(data);
 }
 
 function traverseFileTree(item, path = "", folder) {
@@ -83,7 +128,6 @@ function traverseFileTree(item, path = "", folder) {
 async function readFile(file) {
     const myRegexp = /(.*)\.(.*)$/g;
     const match = myRegexp.exec(file.name);
-
     file.clearName = match[1];
     file.extension = match[2];
 
@@ -95,7 +139,13 @@ async function readFile(file) {
             reader.readAsText(file);
             break;
         case "png":
+        case "jpg":
+        case "jpeg":
+        case "webp":
             reader.readAsDataURL(file);
+            break;
+        case "skel":
+            reader.readAsArrayBuffer(file);
             break;
         default:
             file.result = { status: "error", data: `File "${file.name}" is not supported` };
@@ -107,7 +157,6 @@ async function readFile(file) {
             reader.addEventListener("load", resolve);
             reader.addEventListener("error", reject);
         });
-
         file.result = { status: "ok", data: event.target.result };
         return file;
     } catch {
@@ -178,75 +227,70 @@ export function prepareItemsForLayersMenu(files) {
     const sceneName = files.subFolder ? files.name : null;
     files = files.subFolder ? files.subFolder : files;
 
-    const jsonFiles = files.filter(file => file.extension === "json");
-    let atlasFiles = files.filter(file => file.extension === "atlas");
-    let pngFiles = files.filter(file => file.extension === "png");
+    const jsonFiles = files.filter(f => f.extension === "json");
+    const skelFiles = files.filter(f => f.extension === "skel");
+    let atlasFiles = files.filter(f => f.extension === "atlas");
+    let pngFiles = files.filter(f => ["png", "jpg", "jpeg", "webp"].includes(f.extension));
 
-    const spines = jsonFiles
-        .map(jsonFile => {
-            if (jsonFile.result.status === "error") {
-                alert(jsonFile.result.data);
+    const skeletonFiles = [...jsonFiles, ...skelFiles];
+
+    const spines = skeletonFiles
+        .map(skeletonFile => {
+            if (skeletonFile.result.status === "error") {
+                alert(skeletonFile.result.data);
                 return;
             }
 
-            const atlasFile = atlasFiles.find(({ clearName }) => clearName === jsonFile.clearName);
-            if (!atlasFile) {
-                alert(`Атлас для спайна ${jsonFile.name} не найден`);
-                return;
-            }
-            if (atlasFile.result.status === "error") {
-                alert(atlasFile.result.data);
-                return;
-            }
+            const atlasFile = atlasFiles.find(({ clearName }) => clearName === skeletonFile.clearName);
+            if (!atlasFile) { alert(`Атлас для спайна ${skeletonFile.name} не знайдено`); return; }
+            if (atlasFile.result.status === "error") { alert(atlasFile.result.data); return; }
 
-            const pngFilesForSpineNames = atlasFile.result.data.match(/.*\.png/g);
+            const pngFilesForSpineNames = [...atlasFile.result.data.matchAll(/^[^\s].+\.(?:png|jpe?g|webp)/gmi)]
+                .map(m => m[0]);
+            // const pngFilesForSpineNames = atlasFile.result.data.match(/.*\.png/g) || [];
             const pngFilesForSpine = pngFilesForSpineNames
                 .map(name => pngFiles.find((pngFile) => pngFile.name === name))
-                .filter(file => file !== undefined);
+                .filter(Boolean);
 
             if (pngFilesForSpineNames.length !== pngFilesForSpine.length) {
                 const errorFilesNames = pngFilesForSpineNames
                     .filter(name => !pngFilesForSpine.some(pngFile => pngFile.name === name));
-                alert(`Не найдено "${errorFilesNames}" для спайна ${jsonFile.name}`);
+                alert(`Не знайдено "${errorFilesNames}" для спайна ${skeletonFile.name}`);
                 return;
             }
-
             const errorPng = pngFilesForSpine.find(({ result }) => result.status === "error");
-            if (errorPng) {
-                alert(errorPng.result.data);
-                return;
-            }
+            if (errorPng) { alert(errorPng.result.data); return; }
 
-            // Очистка
+            // очистка наборів, що вже використали
             atlasFiles = atlasFiles.filter(af => af !== atlasFile);
             pngFiles = pngFiles.filter(pf => !pngFilesForSpine.some(pngFile => pngFile === pf));
 
             const item = {
                 type: "item",
-                name: jsonFile.name,
+                name: skeletonFile.name,
                 id: v4(),
-                spineData: createSpineData(jsonFile, atlasFile, pngFilesForSpine)
+                spineData: createSpineData(skeletonFile, atlasFile, pngFilesForSpine)
             };
 
-
-
             const probableAnimations = item.spineData.animations.map(animation => {
-                const events = animation.timelines.find(timeline => timeline instanceof item.spineData.R.EventTimeline)?.events.map(event => {
-                    return { start: event.time, name: event.data.name, id: v4() }
-                }) || [];
-                // const p = new EventTimeline()
-                return {
-                    events,
-                    name: animation.name,
-                    duration: animation.duration,
-                    id: v4()
-                };
+                const EventTimeline = item.spineData.R.EventTimeline;
+                const events = animation.timelines
+                    .find(tl => tl instanceof EventTimeline)
+                    ?.events.map(ev => ({ start: ev.time, name: ev.data.name, id: v4() })) || [];
+                return { events, name: animation.name, duration: animation.duration, id: v4() };
             });
 
-
-
-            // item.spine = new PIXI.spine.Spine(item.spineData);
             item.spine = new item.spineData.R.Spine(item.spineData);
+
+            const skins = item.spineData.skins.map(({ name }) => name);
+            if (!item.spine.skeleton.skin || !skins.includes(!item.spine.skeleton.skin.name)) {
+                if (skins.length === 0) {
+                    item.spine.skeleton.setSkinByName("default");
+                } else {
+                    item.spine.skeleton.setSkinByName(skins[0]);
+                }
+            }
+
             item.probableAnimations = probableAnimations;
             item.animations = [{ timeStart: 0, pickedAnimation: probableAnimations[0], id: v4() }];
 
@@ -256,30 +300,14 @@ export function prepareItemsForLayersMenu(files) {
             item.positionY = 0;
             item.displayObject = item.spine;
 
-            // let _rawPosition = { x: 0, y: 0 };
-            // Object.defineProperty(item, "rawPosition", {
-            //     set: value => {
-            //         _rawPosition.x = value.x;
-            //         _rawPosition.y = value.y;
-            //         item.spine.x = item.position.x;
-            //         item.spine.y = item.position.y;
-            //     },
-            //     get: () => _rawPosition
-            // });
-            //
-            // Object.defineProperty(item, "position", {
-            //     get: () => ({ x: Math.round(item.rawPosition.x), y: Math.round(item.rawPosition.y) })
-            // });
-
             return item;
         })
-        .filter(spine => spine !== undefined);
+        .filter(Boolean);
 
+    // ... решта (PNG-спрайти) без змін
     const sprites = pngFiles
         .map(pngFile => {
-            if (pngFile.result.status === "error") {
-                return;
-            }
+            if (pngFile.result.status === "error") return;
 
             const img = new Image();
             img.src = pngFile.result.data;
@@ -293,9 +321,7 @@ export function prepareItemsForLayersMenu(files) {
             };
 
             item.sprite = new PIXI.Sprite(item.texture);
-
             item.sprite.anchor.set(0.5);
-
             item.rawPositionX = 0;
             item.rawPositionY = 0;
             item.positionX = 0;
@@ -304,10 +330,9 @@ export function prepareItemsForLayersMenu(files) {
 
             return item;
         })
-        .filter(sprite => sprite !== undefined);
+        .filter(Boolean);
 
     const layers = [...spines, ...sprites];
-
     const items = [];
     if (layers.length) {
         items.push({
@@ -319,9 +344,7 @@ export function prepareItemsForLayersMenu(files) {
     }
 
     files.forEach(file => {
-        if (file.subFolder) {
-            items.push(...prepareItemsForLayersMenu(file));
-        }
+        if (file.subFolder) items.push(...prepareItemsForLayersMenu(file));
     });
 
     return items;

@@ -64,6 +64,32 @@
                         </div>
                     </template>
 
+<!--                    <template v-if="parent">-->
+                    <div class="block">
+                        <div class="block__row">
+                            <span class="block__title">Skins</span>
+
+                            <CopyButton :value="skin" />
+
+                            <select
+                                class="placeholder-selector"
+                                v-model="skin"
+                            >
+                                <option value="" disabled>select skin</option>
+
+                                <option
+                                    v-for="s in skins"
+                                    :key="s"
+                                    :value="s"
+                                >
+                                    {{ s }}
+                                </option>
+                            </select>
+
+                        </div>
+                    </div>
+<!--                    </template>-->
+
                     <template v-if="$store.getters['layers/itemToRedact'].spine">
                         <div class="block">
                             <EditBlockCollapsibleContainer :title="`Picked animations (${$store.getters['layers/itemToRedact'].animations.length})`">
@@ -113,6 +139,7 @@
 
 <script>
 import CollapsibleContainer from "../../CollapsibleContainer/CollapsibleContainer.vue";
+import CopyButton from "../../CopyButton/CopyButton.vue";
 import DefaultButton from "../../DefaultButton/DefaultButton.vue";
 import EditableText from "../../EditableText/EditableText.vue";
 import EditableInput from "../../EditableInput/EditableInput.vue";
@@ -122,13 +149,26 @@ import PositionStick from "../../PositionStick/PositionStick.vue";
 import ProbableAnimation from "../../ProbableAnimation/ProbableAnimation.vue";
 
 export default {
-    components: { ProbableAnimation, EditBlockCollapsibleContainer, PickedAnimation, CollapsibleContainer, DefaultButton, PositionStick, EditableText, EditableInput },
+    components: { CopyButton, ProbableAnimation, EditBlockCollapsibleContainer, PickedAnimation, CollapsibleContainer, DefaultButton, PositionStick, EditableText, EditableInput },
     data() {
         return {
             // isEditSceneNameActive: false
         };
     },
     computed: {
+        skins() {
+            return this.$store.getters["layers/itemToRedact"].spineData?.skins?.map(({ name }) => name);
+        },
+        skin: {
+            get() {
+                // return this.$store.getters["layers/itemToRedact"].spineData?.skins?.map(({ name }) => name);
+                return this.$store.getters["layers/itemToRedact"].spine?.skeleton.skin?.name;
+            },
+            set(v) {
+                if (v === "" || v === null) return;
+                this.$store.getters["layers/itemToRedact"].spine?.skeleton.setSkinByName(v);
+            }
+        },
         child() {
             return this.$store.getters["layers/timelineItems"].find(({ id }) => id === this.$store.getters["layers/itemToRedact"]?.id);
         },
