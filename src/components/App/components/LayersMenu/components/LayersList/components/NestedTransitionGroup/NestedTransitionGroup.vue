@@ -13,7 +13,7 @@
             @dragover.stop.prevent="dragover(item, $event)"
             @dragleave.stop="dragleave($event)"
             @dragend.stop=" dragend()"
-            @click.stop="onItemSelect(item)"
+            @pointerdown.stop="onItemSelect(item)"
         >
             <div
                 v-if="item.type === 'scene'"
@@ -50,7 +50,8 @@
                 />
 
                 <h2 class="item-name">
-                    {{ item.name }}
+                    <EditableText v-model="item.name" />
+<!--                    {{ item.name }}-->
                 </h2>
             </div>
             <div
@@ -65,7 +66,8 @@
                     >
                 </span>
                     <h2 class="item-name">
-                        {{ item.name }}
+<!--                        {{ item.name }}-->
+                        <EditableText v-model="item.name" />
                     </h2>
                 </div>
 
@@ -95,10 +97,11 @@
 import gsap from "gsap";
 
 import BtnRemove from "../../../../../../../BtnRemove";
+import EditableText from "../../../../../../../EditableText/EditableText.vue";
 
 export default {
     name: "NestedTransitionGroup",
-    components: { BtnRemove },
+    components: { EditableText, BtnRemove },
     props: {
         items: {
             type: Array,
@@ -303,6 +306,8 @@ export default {
     &_item
         .item-header
             justify-content: space-between
+            padding: 0 10px
+    //background-color: var(--color-light)
 
     .item-name
         font-size: 14px
@@ -402,7 +407,10 @@ export default {
 
     &_drag-target
         opacity: 0.5
-        background-color: var(--color-accent-draggable)
+        //background-color: var(--color-accent-draggable)
+        .item-header
+            background-color: var(--color-accent-draggable)
+            //background-color: inherit
     &_drop-target
         &:after
             content: ""

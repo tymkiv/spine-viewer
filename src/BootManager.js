@@ -102,6 +102,7 @@ export function createSpineDisplay(skelOrJson, atlas, pngPages, preferRuntime = 
 
 function traverseFileTree(item, path = "", folder) {
     return new Promise(resolve => {
+        if (!item) return resolve();
         if (item.isFile) {
             item.file(async file => {
                 file = await readFile(file);
@@ -245,8 +246,10 @@ export function prepareItemsForLayersMenu(files) {
             if (!atlasFile) { alert(`Атлас для спайна ${skeletonFile.name} не знайдено`); return; }
             if (atlasFile.result.status === "error") { alert(atlasFile.result.data); return; }
 
-            const pngFilesForSpineNames = [...atlasFile.result.data.matchAll(/^[^\s].+\.(?:png|jpe?g|webp)/gmi)]
+            // const pngFilesForSpineNames = [...atlasFile.result.data.matchAll(/^[^\s].+\.(?:png|jpe?g|webp)/gmi)]
+            const pngFilesForSpineNames = [...atlasFile.result.data.matchAll(/^[^\s].*\.(?:png|jpe?g|webp)$/gmi)]
                 .map(m => m[0]);
+
             // const pngFilesForSpineNames = atlasFile.result.data.match(/.*\.png/g) || [];
             const pngFilesForSpine = pngFilesForSpineNames
                 .map(name => pngFiles.find((pngFile) => pngFile.name === name))

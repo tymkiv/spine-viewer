@@ -14,9 +14,9 @@
             class="boot-menu"
         />
 
-        <settings-menu />
+        <settings-menu @on-load-items="handleFiles" />
 
-        <top-menu @on-load-items="handleFiles" />
+<!--        <top-menu @on-load-items="handleFiles" />-->
 
         <split-container
             :dbl-click-splitter="false"
@@ -187,7 +187,7 @@ export default {
 
 <style scoped lang="sass">
 .split-container
-    height: calc(100vh - 80px)
+    height: calc(100vh - 25px)
 
 .boot-menu
     position: absolute

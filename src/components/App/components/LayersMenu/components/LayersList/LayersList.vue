@@ -185,6 +185,18 @@ export default {
             this.$store.dispatch("layers/insert", { items: dragTarget, indexes: dropIndexes });
             // this.$store.commit("insert", { itemsToInsert: dragTarget, indexes: dropIndexes });
 
+            if (dropTarget.type === "scene") {
+                this.$store.dispatch("layers/selectSceneToDisplay", dropTarget);
+            } else {
+                const find = (parent, needed) => {
+                    if (!parent.items) return;
+                    return parent.items.some(item => item === needed || find(item, needed));
+                };
+
+                const scene = this.$store.getters["layers/items"].find(scene => find(scene, dropTarget));
+                this.$store.dispatch("layers/selectSceneToDisplay", scene);
+            }
+
             // Удаление пустой группы
             this.tryToRemoveEmptyScene(scene);
         },

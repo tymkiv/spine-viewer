@@ -37,6 +37,9 @@ export default {
     computed: {
         isCursorShow() {
             return this.isPointerOver || this.isPointerDown;
+        },
+        pixelsPerSecond() {
+            return this.$store.getters["app/pixelsPerSecond"];
         }
     },
     methods: {
@@ -47,7 +50,7 @@ export default {
             this.isPointerOver = true;
             // console.log(event)
             const computed = Math.min(Math.max(0, e.offsetX - 20), e.target.scrollWidth - 40);
-            this.time = computed / 200;
+            this.time = computed / this.pixelsPerSecond;
         },
         onPointerDown(event) {
             this.pointerId = event.pointerId;
@@ -95,14 +98,14 @@ export default {
 
             const computed = Math.min(Math.max(0, e.offsetX - 20), e.target.scrollWidth - 40);
 
-            this.time = computed / 200;
+            this.time = computed / this.pixelsPerSecond;
             // console.log(e.offsetX)
         },
         block(ev) { ev.preventDefault(); },
         onPointerMove(e) {
             if (this.isPointerDown) return;
             const computed = Math.min(Math.max(0, e.offsetX - 20), e.target.scrollWidth - 40);
-            this.time = computed / 200;
+            this.time = computed / this.pixelsPerSecond;
         }
     }
 };

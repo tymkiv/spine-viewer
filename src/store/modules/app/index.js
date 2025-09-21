@@ -8,12 +8,17 @@ const index = {
     _SCALE: 1,
     _USER_CURSOR: 0,
     _SHOW_USER_CURSOR: false,
-    _ACTIVE_USER_CURSOR: false
+    _ACTIVE_USER_CURSOR: false,
+    _PIXELS_PER_SECOND: 200
 };
 
 const getters = {
     listeners(state) {
         return state._LISTENERS;
+    },
+
+    pixelsPerSecond(state) {
+        return state._PIXELS_PER_SECOND;
     },
 
     cursorGrabbing(state) {
@@ -98,6 +103,10 @@ const mutations = {
 
     _SET_ACTIVE_USER_CURSOR(state, value) {
         state._ACTIVE_USER_CURSOR = value;
+    },
+
+    _SET_PIXELS_PER_SECOND(state, value) {
+        state._PIXELS_PER_SECOND = value;
     }
 
 };
@@ -149,6 +158,10 @@ const actions = {
 
     setActiveUserCursor({ commit }, value) {
         commit("_SET_ACTIVE_USER_CURSOR", value);
+    },
+
+    setPixelsPerSecond({ commit }, value) {
+        commit("_SET_PIXELS_PER_SECOND", value);
     }
 };
 

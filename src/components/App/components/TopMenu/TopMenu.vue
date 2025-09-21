@@ -2,42 +2,45 @@
     <div class="top-menu">
         <div class="top-menu__shadow" />
 
-        <div class="manage-center">
-            <button
-                class="btn btn_accent"
-                :disabled="!$store.getters['layers/timelineItems'].length"
-                @click="$store.dispatch('app/setPlay', !$store.getters['app/play'])"
-            >
-                <template v-if="!$store.getters['app/play'] || !$store.getters['layers/timelineItems'].length ">Play</template>
-                <template v-else>Pause</template>
-            </button>
-            <button
-                class="btn"
-                :disabled="!$store.getters['layers/timelineItems'].length"
-                @click="() => {$store.getters['app/listeners'].restart?.forEach(cb => cb()); $store.dispatch('app/setPlay', true)}"
-            >
-                Restart
-            </button>
+<!--        <div class="manage-center">-->
+<!--            <button-->
+<!--                class="btn btn_accent"-->
+<!--                :disabled="!$store.getters['layers/timelineItems'].length"-->
+<!--                @click="$store.dispatch('app/setPlay', !$store.getters['app/play'])"-->
+<!--            >-->
+<!--                <template v-if="!$store.getters['app/play'] || !$store.getters['layers/timelineItems'].length ">Play</template>-->
+<!--                <template v-else>Pause</template>-->
+<!--            </button>-->
+<!--            <button-->
+<!--                class="btn"-->
+<!--                :disabled="!$store.getters['layers/timelineItems'].length"-->
+<!--                @click="() => {$store.getters['app/listeners'].restart?.forEach(cb => cb()); $store.dispatch('app/setPlay', true)}"-->
+<!--            >-->
+<!--                Restart-->
+<!--            </button>-->
 
-            <label class="label">
-                <span class="name"> Loop </span>
-                <input class="checkbox" type="checkbox" :checked="$store.getters['app/loop']" @change="$store.dispatch('app/setLoop', $event.target.checked)">
-                <span class="fake-checkbox" />
-            </label>
+<!--            <label class="label">-->
+<!--                <span class="name"> Loop </span>-->
+<!--                <input class="checkbox" type="checkbox" :checked="$store.getters['app/loop']" @change="$store.dispatch('app/setLoop', $event.target.checked)">-->
+<!--                <span class="fake-checkbox" />-->
+<!--            </label>-->
 
-            <div class="speed">
-                <span class="speed-title">Speed</span>
-                <div ref="speed-range" class="speed-range" @mousedown.prevent="mouseDown($event)">
-                    <div
-                        ref="speed-cursor"
-                        class="speed-cursor"
+<!--            <div class="speed">-->
+<!--                <span class="speed-title">Speed</span>-->
+<!--&lt;!&ndash;                <div ref="speed-range" class="speed-range" @mousedown.prevent="mouseDown($event)">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div&ndash;&gt;-->
+<!--&lt;!&ndash;                        ref="speed-cursor"&ndash;&gt;-->
+<!--&lt;!&ndash;                        class="speed-cursor"&ndash;&gt;-->
 
-                    ></div>
-                </div>
-            </div>
+<!--&lt;!&ndash;                    ></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--                <RangeInput v-model="mySpeed" :max-value="2" />-->
+
+<!--            </div>-->
 
 
-        </div>
+<!--        </div>-->
 
 <!--        <div class="redact-center">-->
 <!--            <label-->
@@ -80,7 +83,9 @@
 
 <script>
 import gsap from "gsap";
+import RangeInput from "../../../RangeInput/RangeInput.vue";
 export default {
+    components: { RangeInput },
     emits: ["on-load-items"],
 
     computed: {
@@ -89,6 +94,17 @@ export default {
         },
         speed() {
             return this.$store.getters["app/speed"];
+        },
+        mySpeed: {
+            get() {
+                // return this.$store.getters["layers/itemToRedact"].spineData?.skins?.map(({ name }) => name);
+                return this.$store.getters["app/speed"];
+            },
+            set(v) {
+                console.log("v:", v)
+                if (v === undefined || v === null || v > 2 || v < 0) return;
+                this.$store.dispatch("app/setSpeed", v);
+            }
         }
     },
     watch: {
@@ -138,7 +154,7 @@ export default {
             this.$store.dispatch("app/setSpeed", speed);
         },
         setSpeedCursor() {
-            gsap.set(this.$refs["speed-cursor"], { x: this.speed * this.$refs["speed-range"].offsetWidth });
+            // gsap.set(this.$refs["speed-cursor"], { x: this.speed * this.$refs["speed-range"].offsetWidth });
         }
     }
 };

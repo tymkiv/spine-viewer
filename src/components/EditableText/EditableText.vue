@@ -48,10 +48,12 @@ export default {
 
 <style scoped lang="sass">
 .editable
+    color: inherit
     &__text
         cursor: pointer
         border-bottom: 1px solid transparent
         transform: translateY(1px)
+        color: inherit
     &__input
         border: none
         border-bottom: 1px solid #D9D9D9

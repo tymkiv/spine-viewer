@@ -83,6 +83,9 @@ export default {
         }
     },
     mounted() {
+        console.log(this.$refs.wrapper)
+        console.log(this.$refs.track)
+        console.log(this.scroller)
         this.moveByTimeStart(this.timeStart);
         const width = this.timeStart * 200 + Math.max(this.$refs.wrapper.offsetWidth, this.pickedAnimation.duration * 200 + 25);
         gsap.set(this.$refs.track, { width: this.scroller.clientWidth > width ? "" : width });
@@ -93,6 +96,7 @@ export default {
             this.lastX = timeStart * 200 - this.deltaX;
         },
         mousedown(e) {
+            console.log(e)
             this.startX = e.clientX;
             this.rightBorder = this.getUpdatedRightBorder();
             this.leftBorder = this.getUpdatedLeftBorder();

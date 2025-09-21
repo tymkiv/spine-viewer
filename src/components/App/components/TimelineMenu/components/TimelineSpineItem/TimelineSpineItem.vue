@@ -9,7 +9,7 @@
             :key="animation.id"
             class="list-item"
         >
-            <track-element
+            <track-element-v2
                 :scroller="scroller"
                 :picked-animation="animation.pickedAnimation"
                 :time-start="animation.timeStart"
@@ -32,9 +32,10 @@
 </template>
 
 <script>
+import TrackElementV2 from "../TrackElement/TrackElementV2.vue";
 import TrackElement from "../TrackElement";
 export default {
-    components: { TrackElement },
+    components: { TrackElementV2, TrackElement },
     props: {
         scroller: {
             type: [null, HTMLDivElement],

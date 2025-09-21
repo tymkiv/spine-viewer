@@ -64,33 +64,33 @@
                         </div>
                     </template>
 
-<!--                    <template v-if="parent">-->
-                    <div class="block">
-                        <div class="block__row">
-                            <span class="block__title">Skins</span>
-
-                            <CopyButton :value="skin" />
-
-                            <select
-                                class="placeholder-selector"
-                                v-model="skin"
-                            >
-                                <option value="" disabled>select skin</option>
-
-                                <option
-                                    v-for="s in skins"
-                                    :key="s"
-                                    :value="s"
-                                >
-                                    {{ s }}
-                                </option>
-                            </select>
-
-                        </div>
-                    </div>
-<!--                    </template>-->
-
                     <template v-if="$store.getters['layers/itemToRedact'].spine">
+                        <div class="block">
+                            <div class="block__row">
+                                <span class="block__title">Skins</span>
+
+                                <CopyButton :value="skin" />
+
+                                <select
+                                    class="placeholder-selector"
+                                    v-model="skin"
+                                >
+                                    <option value="" disabled>select skin</option>
+
+                                    <option
+                                        v-for="s in skins"
+                                        :key="s"
+                                        :value="s"
+                                    >
+                                        {{ s }}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+
+
+
                         <div class="block">
                             <EditBlockCollapsibleContainer :title="`Picked animations (${$store.getters['layers/itemToRedact'].animations.length})`">
                                 <transition-group
