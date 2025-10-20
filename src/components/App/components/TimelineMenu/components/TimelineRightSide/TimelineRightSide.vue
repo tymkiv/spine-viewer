@@ -203,7 +203,6 @@ export default {
         mySpeed: {
             get() {
                 // return this.$store.getters["layers/itemToRedact"].spineData?.skins?.map(({ name }) => name);
-                console.log(this.$store.getters["app/speed"])
                 return Number(this.$store.getters["app/speed"]);
             },
             set(v) {
