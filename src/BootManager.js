@@ -287,10 +287,11 @@ export function prepareItemsForLayersMenu(files) {
 
             const skins = item.spineData.skins.map(({ name }) => name);
             if (!item.spine.skeleton.skin || !skins.includes(!item.spine.skeleton.skin.name)) {
+                item.spine.skeleton.setSkin(null);
                 if (skins.length === 0) {
                     item.spine.skeleton.setSkinByName("default");
                 } else {
-                    item.spine.skeleton.setSkinByName(skins[0]);
+                    item.spine.skeleton.setSkin(item.spineData.skins[0]);
                 }
             }
 

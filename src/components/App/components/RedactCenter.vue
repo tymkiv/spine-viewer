@@ -166,7 +166,13 @@ export default {
             },
             set(v) {
                 if (v === "" || v === null) return;
-                this.$store.getters["layers/itemToRedact"].spine?.skeleton.setSkinByName(v);
+
+                const skin = this.$store.getters["layers/itemToRedact"].spineData?.skins?.find(({ name }) => name === v);
+
+                if (skin) {
+                    this.$store.getters["layers/itemToRedact"].spine?.skeleton.setSkin(null);
+                    this.$store.getters["layers/itemToRedact"].spine?.skeleton.setSkin(skin);
+                }
             }
         },
         child() {
