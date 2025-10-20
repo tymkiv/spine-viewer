@@ -103,7 +103,7 @@
 
                     <EditableInput
                         class="header__settings__scale__input"
-                        :value="mySpeed.toFixed(2)"
+                        :value="mySpeed"
                         @change="mySpeed = $event.target.value"
                     />
                 </div>
@@ -203,11 +203,14 @@ export default {
         mySpeed: {
             get() {
                 // return this.$store.getters["layers/itemToRedact"].spineData?.skins?.map(({ name }) => name);
-                return this.$store.getters["app/speed"];
+                console.log(this.$store.getters["app/speed"])
+                return Number(this.$store.getters["app/speed"]);
             },
             set(v) {
-                console.log("v:", v)
-                if (v === undefined || v === null || v > 2 || v < 0) return;
+                if (v === undefined || v === null) return;
+
+                v = Math.min(Math.max(v, 0), 2);
+
                 this.$store.dispatch("app/setSpeed", v);
             }
         },
@@ -217,7 +220,10 @@ export default {
             },
             set(value) {
                 value = Number(value);
-                if (value === "" || value === null || value === undefined || Number.isNaN(value) || value < this.timelineZoomMinValue || value > this.timelineZoomMaxValue) return;
+                if (value === "" || value === null || value === undefined || Number.isNaN(value)) return;
+
+                value = Math.min(Math.max(value, this.timelineZoomMinValue), this.timelineZoomMaxValue);
+
                 this.$store.dispatch("app/setPixelsPerSecond", value * this.defaultPixelsPerSecond);
             }
         },

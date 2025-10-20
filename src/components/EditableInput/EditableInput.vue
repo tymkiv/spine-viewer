@@ -15,7 +15,7 @@
             ref="input"
             class="editable__input"
             :type="type"
-            :value="tempValue ?? value"
+            :value="tempValue ?? (+value)?.toFixed(2)"
             @input="tempValue = $event.target.value"
             @keydown.enter.prevent="onEnter($event)"
             @keydown.esc.prevent="$refs.input.blur()"
