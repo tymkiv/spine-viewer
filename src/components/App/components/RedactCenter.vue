@@ -198,6 +198,9 @@ export default {
             const pla = [];
             const rest = [];
             for (const s of slots) (s.name.startsWith("pla") ? pla : rest).push(s);
+
+            pla.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
             rest.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
             return [...pla, ...rest];
         }
