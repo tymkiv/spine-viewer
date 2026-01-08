@@ -281,7 +281,7 @@ export function prepareItemsForLayersMenu(files) {
                     .find(tl => tl instanceof EventTimeline)
                     ?.events.map(ev => ({ start: ev.time, name: ev.data.name, id: v4() })) || [];
                 return { events, name: animation.name, duration: animation.duration, id: v4() };
-            }).sort((a, b) => a.name.localeCompare(b.name));
+            }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
             item.spine = new item.spineData.R.Spine(item.spineData);
 
