@@ -58,6 +58,16 @@ export const findIndexes = (items, item) => {
     return null;
 };
 
+/**
+ * Determines whether a drag event carries OS files.
+ * Checks for the "Files" type instead of types.length, because Chrome 150+
+ * populates types (e.g. "chromium/x-drag-id") even for internal drags
+ * that never call setData.
+ * @param {DragEvent} event
+ * @returns {boolean}
+ */
+export const isFileDrag = (event) => [...event.dataTransfer.types].includes("Files");
+
 export const flat = (items, parent) => {
     const result = [];
 

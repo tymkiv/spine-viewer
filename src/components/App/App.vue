@@ -1,5 +1,4 @@
 <template>
-
     <div
         :class="{'grabbing': cursorGrabbing}"
         @click="dispatch($event)"
@@ -16,7 +15,7 @@
 
         <settings-menu @on-load-items="handleFiles" />
 
-<!--        <top-menu @on-load-items="handleFiles" />-->
+        <!--        <top-menu @on-load-items="handleFiles" />-->
 
         <split-container
             :dbl-click-splitter="false"
@@ -48,9 +47,7 @@
                         size="20"
                         max-size="50"
                         min-size="5"
-
                     >
-
                         <redact-center />
                     </split-pane>
                 </split-container>
@@ -85,6 +82,7 @@ import {
     prepareItemsForLayersMenu,
     prepareItemsForResourceMenu
 } from "../../BootManager";
+import { isFileDrag } from "../../utils";
 
 export default {
     components: {
@@ -139,25 +137,25 @@ export default {
             this.bootOver = false;
         },
         onDragenter(event) {
-            if (event.dataTransfer.types.length) {
+            if (isFileDrag(event)) {
                 event.stopPropagation();
                 this.showBootOver();
             }
         },
         onDragover(event) {
-            if (event.dataTransfer.types.length) {
+            if (isFileDrag(event)) {
                 event.stopPropagation();
                 this.showBootOver();
             }
         },
         onDragleave(event) {
-            if (event.dataTransfer.types.length) {
+            if (isFileDrag(event)) {
                 event.stopPropagation();
                 this.hideBootOver();
             }
         },
         onDrop(event) {
-            if (event.dataTransfer.types.length) {
+            if (isFileDrag(event)) {
                 event.stopPropagation();
                 this.hideBootOver();
                 this.handleItems(event.dataTransfer.items);

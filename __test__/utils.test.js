@@ -1,4 +1,20 @@
-import { includes, findIndexes, flat } from "../src/utils";
+import { includes, findIndexes, flat, isFileDrag } from "../src/utils";
+
+describe("isFileDrag", () => {
+    test.each([
+        // drag файлов из OS
+        { types: ["Files"], result: true },
+        { types: ["text/uri-list", "Files"], result: true },
+        // внутренний drag без setData (Chrome < 150)
+        { types: [], result: false },
+        // внутренний drag без setData (Chrome 150+ добавляет служебный тип)
+        { types: ["chromium/x-drag-id"], result: false },
+        // drag текста/ссылок
+        { types: ["text/plain"], result: false }
+    ])("%j", ({ types, result }) => {
+        expect(isFileDrag({ dataTransfer: { types } })).toBe(result);
+    });
+});
 
 describe("findIndexes", () => {
     const item = { a: "find" };
